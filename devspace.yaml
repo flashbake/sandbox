@@ -1,0 +1,6 @@
+version: v1beta9
+images:
+  flashbake:
+    image: flashbake
+    dockerfile: ./flashbake/Dockerfile
+    context: ./flashbake
