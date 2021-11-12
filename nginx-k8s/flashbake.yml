@@ -21,3 +21,18 @@ spec:
           name: client
         - containerPort: 11732
           name: baker
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flashbake
+spec:
+  ports:
+  - port: 10732
+    name: client
+    targetPort: 10732
+  - port: 11732
+    name: baker
+    targetPort: 11732
+  selector:
+    app: flashbake
