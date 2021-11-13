@@ -18,7 +18,12 @@ app.post('/injection/operation', function (req, res) {
     console.log(opHash);
     res.json(opHash);
 });
-app.use('/chains/main/mempool/monitor_operations', (0, http_proxy_middleware_1.createProxyMiddleware)({ target: 'http://tezos-node-rpc:8732', changeOrigin: true }));
+var mempoolProxy = (0, http_proxy_middleware_1.createProxyMiddleware)({
+    target: 'http://tezos-node-rpc:8732',
+    changeOrigin: true
+});
+app.use('/chains/main/mempool/monitor_operations', mempoolProxy);
+app.use('/chains/main/chain_id', mempoolProxy);
 app.listen(port, function () {
     console.log("Flashbake relay and endpoint listening at http://localhost:" + port);
 });
