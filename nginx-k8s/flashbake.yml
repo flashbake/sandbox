@@ -19,8 +19,9 @@ spec:
         ports:
         - containerPort: 10732
           name: client
-        - containerPort: 11732
-          name: baker
+        env:
+          - name: DEBUG
+            value: '*'
 ---
 apiVersion: v1
 kind: Service
@@ -31,8 +32,5 @@ spec:
   - port: 10732
     name: client
     targetPort: 10732
-  - port: 11732
-    name: baker
-    targetPort: 11732
   selector:
     app: flashbake

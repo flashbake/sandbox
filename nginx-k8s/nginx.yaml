@@ -78,7 +78,7 @@ data:
       keepalive 1024;
     }
     server {
-      listen 80 default_server;
+      listen 10732 default_server;
       root /usr/local/app;
       access_log /var/log/nginx/app.access_log main;
       error_log /var/log/nginx/app.error_log;
@@ -91,6 +91,20 @@ data:
         proxy_http_version 1.1;
       }
     }
+    server {
+      listen 11732 default_server;
+      root /usr/local/app;
+      access_log /var/log/nginx/app.access_log main;
+      error_log /var/log/nginx/app.error_log;
+      location / {
+        proxy_pass http://tezos-node-rpc.nico.svc.cluster.local:8732;
+        proxy_http_version 1.1;
+      }
+      location /chains/main/mempool/monitor_operations {
+        proxy_pass http://flashbake.nico.svc.cluster.local:10732;
+        proxy_http_version 1.1;
+      }
+    }
 ---
 apiVersion: v1
 kind: Service
@@ -98,7 +112,11 @@ metadata:
   name: nginx
 spec:
   ports:
-  - port: 80
-    targetPort: 80
+  - port: 10732
+    name: endpoint
+    targetPort: 10732
+  - port: 11732
+    name: baker
+    targetPort: 11732
   selector:
     app: nginx
