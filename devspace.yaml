@@ -1,6 +1,6 @@
 version: v1beta9
 images:
   flashbake:
-    image: flashbake
+    image: tezos-k8s-flashbake
     dockerfile: ./flashbake/Dockerfile
     context: ./flashbake
