@@ -8,9 +8,15 @@ var bodyParser = require('body-parser');
 const app = express()
 const port = 10732
 
+//every other query is directly proxied to the node
+const mempoolProxy = createProxyMiddleware({
+    target: 'http://localhost:8732',
+    changeOrigin: false });
+app.use('/**', mempoolProxy);
+
 app.use(bodyParser.text({type:"*/*"}));
 
-app.post('/injection/operation', (req, res) => {
+app.post('/flashbake_injection/operation', (req, res) => {
   console.log("flashbake transaction received from client:");
   console.log(JSON.parse(req.body));
   console.log("transaction hash:");
@@ -22,7 +28,7 @@ app.post('/injection/operation', (req, res) => {
 // mempool queries are handled directly
 app.get('/chains/main/mempool/monitor_operations', (req, res) => {
 
-  http.get('http://tezos-node-rpc:8732/chains/main/mempool/monitor_operations', (resp) => {
+  http.get('http://localhost:8732/chains/main/mempool/monitor_operations', (resp) => {
 
     res.setHeader('Content-Type', 'application/json');
     res.removeHeader("Connection");
@@ -41,13 +47,7 @@ app.get('/chains/main/mempool/monitor_operations', (req, res) => {
     console.log("Error: " + err.message);
   });
 })
-
-// every other query is directly proxied to the node
-//const mempoolProxy = createProxyMiddleware({
-//    target: 'http://tezos-node-rpc:8732',
-//    changeOrigin: true });
-//app.use('/**', mempoolProxy);
-
+//
 let server = app.listen(port, () => {
   console.log(`Flashbake relay and endpoint listening at http://localhost:${port}`)
 })
