@@ -29,14 +29,11 @@ var http = __importStar(require("http"));
 var bodyParser = require('body-parser');
 var app = (0, express_1.default)();
 var port = 10732;
-//every other query is directly proxied to the node
 var mempoolProxy = (0, http_proxy_middleware_1.createProxyMiddleware)({
     target: 'http://localhost:8732',
     changeOrigin: false
 });
-app.use('/**', mempoolProxy);
-app.use(bodyParser.text({ type: "*/*" }));
-app.post('/flashbake_injection/operation', function (req, res) {
+app.post('/flashbake_injection/operation', bodyParser.text({ type: "*/*" }), function (req, res) {
     console.log("flashbake transaction received from client:");
     console.log(JSON.parse(req.body));
     console.log("transaction hash:");
@@ -51,6 +48,7 @@ app.get('/chains/main/mempool/monitor_operations', function (req, res) {
         res.removeHeader("Connection");
         // A chunk of data has been received.
         resp.on('data', function (chunk) {
+            console.log("Using the flashbake middleware for operation injection, seems broken");
             console.log(chunk.toString());
             res.write(chunk);
         });
@@ -62,6 +60,8 @@ app.get('/chains/main/mempool/monitor_operations', function (req, res) {
         console.log("Error: " + err.message);
     });
 });
+//every query except mempool is directly proxied to the node
+app.use('/*', mempoolProxy);
 //
 var server = app.listen(port, function () {
     console.log("Flashbake relay and endpoint listening at http://localhost:" + port);
