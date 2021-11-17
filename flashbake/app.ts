@@ -38,7 +38,7 @@ app.get('/chains/main/mempool/monitor_operations', (req, res) => {
     // A chunk of data has been received.
     resp.on('data', (chunk) => {
       console.log("Received the following from node's mempool:");
-      console.log(JSON.parse(chunk));
+      console.log(JSON.stringify(chunk));
       res.write(chunk);
     });
   
