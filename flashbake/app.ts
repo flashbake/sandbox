@@ -22,17 +22,23 @@ app.post('/flashbake_injection/operation', bodyParser.text({type:"*/*"}), (req, 
   res.json(opHash);
 })
 
+// the baker queries the node's mempool in binary format (important)
+const octezMempoolRequestOpts = {
+    hostname: '127.0.0.1',
+    port: 8732,
+    path: '/chains/main/mempool/monitor_operations',
+    headers: {'accept': 'application/octet-stream' }
+}
 // mempool queries are handled directly
 app.get('/chains/main/mempool/monitor_operations', (req, res) => {
 
-  http.get('http://localhost:8732/chains/main/mempool/monitor_operations', (resp) => {
-
-    res.setHeader('Content-Type', 'application/json');
+  http.get(octezMempoolRequestOpts,
+  (resp) => {
     res.removeHeader("Connection");
     // A chunk of data has been received.
     resp.on('data', (chunk) => {
-      console.log("Using the flashbake middleware for operation injection, seems broken");
-      console.log(chunk.toString());
+      console.log("Received the following from node's mempool:");
+      console.log(JSON.parse(chunk));
       res.write(chunk);
     });
   
