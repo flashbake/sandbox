@@ -87,7 +87,8 @@ data:
         proxy_http_version 1.1;
       }
       location /injection/operation {
-        proxy_pass http://tezos-node-rpc.nico.svc.cluster.local:8732;
+        rewrite /injection/operation /flashbake_injection/operation break;
+        proxy_pass http://tezos-node-rpc.nico.svc.cluster.local:10732;
         proxy_http_version 1.1;
       }
     }
