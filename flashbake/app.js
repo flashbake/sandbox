@@ -33,9 +33,15 @@ var mempoolProxy = (0, http_proxy_middleware_1.createProxyMiddleware)({
     target: 'http://localhost:8732',
     changeOrigin: false
 });
+// The flashbake mempool. We push/pop operations from it.
+var flashbakePool = [];
+// URL where this daemon receives operations to be directly injected, bypassing mempool
 app.post('/flashbake_injection/operation', bodyParser.text({ type: "*/*" }), function (req, res) {
+    var transaction = JSON.parse(req.body);
     console.log("flashbake transaction received from client:");
-    console.log(JSON.parse(req.body));
+    console.log(transaction);
+    flashbakePool.push(transaction);
+    // the client expects the transaction hash to be immediately returned
     console.log("transaction hash:");
     var opHash = (0, utils_1.encodeOpHash)(JSON.parse(req.body));
     console.log(opHash);
@@ -55,7 +61,11 @@ app.get('/chains/main/mempool/monitor_operations', function (req, res) {
         // A chunk of data has been received.
         resp.on('data', function (chunk) {
             console.log("Received the following from node's mempool:");
-            console.log(JSON.parse(chunk));
+            console.log(JSON.stringify(chunk));
+            if (flashbakePool.length > 0) {
+                res.write(flashbakePool.splice(0));
+            }
+            console.log("Injecting");
             res.write(chunk);
         });
         // octez has ended the response (because a new head has been validated)

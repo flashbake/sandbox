@@ -12,10 +12,17 @@ const mempoolProxy = createProxyMiddleware({
     target: 'http://localhost:8732',
     changeOrigin: false });
 
+// The flashbake mempool. We push/pop operations from it.
+let flashbakePool: string[] = [];
 
+// URL where this daemon receives operations to be directly injected, bypassing mempool
 app.post('/flashbake_injection/operation', bodyParser.text({type:"*/*"}), (req, res) => {
+  let transaction = JSON.parse(req.body);
   console.log("flashbake transaction received from client:");
-  console.log(JSON.parse(req.body));
+  console.log(transaction);
+  flashbakePool.push(transaction);
+
+  // the client expects the transaction hash to be immediately returned
   console.log("transaction hash:");
   const opHash = encodeOpHash(JSON.parse(req.body));
   console.log(opHash);
@@ -39,6 +46,11 @@ app.get('/chains/main/mempool/monitor_operations', (req, res) => {
     resp.on('data', (chunk) => {
       console.log("Received the following from node's mempool:");
       console.log(JSON.stringify(chunk));
+      if (flashbakePool.length > 0) {
+          // FIXME: must convert json to binary
+          res.write(flashbakePool.splice(0));
+      }
+      console.log("Injecting");
       res.write(chunk);
     });
   
