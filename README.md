@@ -3,11 +3,11 @@ Flashbake prototype
 
 Consists of:
 
-* a typescript flashbake endpoint+relay with:
+* a typescript **flashbake endpoint** with:
   * an injection endpoint for a tezos client to push an operation
   * logic to intercept mempool transmission between node and baker
-* a nginx config acting as tezos rpc, and forwarding most queries to an actual tezos RPC, except the inject operation which goes to the flashbake endpoint+relay
-* a fork of tezos-k8s to host flashbake relay as a proxy between node and baker, injecting operations if applicable
+* **flashbake relay**, a nginx config acting as tezos rpc, and forwarding most queries to an actual tezos RPC, except the inject operation which goes to the flashbake endpoint
+* a fork of tezos-k8s to host flashbake relay as a proxy between node and baker, listening on port 10732 as injection endpoint
 
 ## How to deploy the prototype locally
 
@@ -47,5 +47,5 @@ tezos-client -d /var/tezos/client  transfer 444 from tezos-baking-node-0 to test
 To send a transaction with flashbake, bypassing the mempool, change the endpoint to the flashbake relay:
 
 ```
-tezos-client -d /var/tezos/client --endpoint http://flashbake-relay:8732 transfer 555 from tezos-baking-node-0 to test --burn-cap 0.257
+tezos-client -d /var/tezos/client --endpoint http://flashbake-relay:8732 transfer 555 from tezos-baking-node-0 to test
 ```
