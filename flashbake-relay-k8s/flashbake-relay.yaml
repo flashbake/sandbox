@@ -78,7 +78,7 @@ data:
       keepalive 1024;
     }
     server {
-      listen 11732 default_server;
+      listen 8732 default_server;
       root /usr/local/app;
       access_log /var/log/nginx/app.access_log main;
       error_log /var/log/nginx/app.error_log;
@@ -99,8 +99,8 @@ metadata:
   name: flashbake-relay
 spec:
   ports:
-  - port: 11732
+  - port: 8732
     name: endpoint
-    targetPort: 11732
+    targetPort: 8732
   selector:
     app: nginx
