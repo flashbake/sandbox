@@ -37,7 +37,7 @@ helm install -f tezos-k8s-flashbake-values.yaml flashbake tezos-k8s/charts/tezos
 Deploy the flashbake relay (which is just a nginx container with some custom config):
 
 ```
-kubectl apply -f flashbake-relay-k8s/flashbake-relay.yaml
+kubectl apply -f flashbake-relay-k8s/flashbake-relay.yaml -n flashbake
 ```
 
 ## Run a flashbake transaction

@@ -83,12 +83,12 @@ data:
       access_log /var/log/nginx/app.access_log main;
       error_log /var/log/nginx/app.error_log;
       location / {
-        proxy_pass http://tezos-node-rpc.nico.svc.cluster.local:8732;
+        proxy_pass http://tezos-node-rpc.flashbake.svc.cluster.local:8732;
         proxy_http_version 1.1;
       }
       location /injection/operation {
         rewrite /injection/operation /flashbake_injection/operation break;
-        proxy_pass http://tezos-node-rpc.nico.svc.cluster.local:10732;
+        proxy_pass http://tezos-node-rpc.flashbake.svc.cluster.local:10732;
         proxy_http_version 1.1;
       }
     }
