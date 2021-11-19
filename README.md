@@ -7,7 +7,7 @@ Consists of:
   * an injection endpoint for a tezos client to push an operation
   * logic to intercept mempool transmission between node and baker
 * a nginx config acting as tezos rpc, and forwarding most queries to an actual tezos RPC, except the inject operation which goes to the flashbake endpoint+relay
-* a fork of tezos-k8s to host flashbake
+* a fork of tezos-k8s to host flashbake relay as a proxy between node and baker, injecting operations if applicable
 
 ## How to deploy the prototype locally
 
