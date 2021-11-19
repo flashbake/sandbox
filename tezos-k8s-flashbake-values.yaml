@@ -86,5 +86,5 @@ protocols:
   - command: alpha
 
 tezos_k8s_images:
-  utils: oxheadinfra/tezos-k8s-utils:5.3.1
+  utils: oxheadalpha/tezos-k8s-utils:5.3.1
   flashbake: tezos-k8s-flashbake:dev
