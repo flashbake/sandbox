@@ -41,19 +41,29 @@ app.post('/flashbake_injection/operation', bodyParser.text({type:"*/*"}), (req, 
 // Note that this mempool format is not parseable by tezos-codec
 function convertTransactionToMempoolBinary(transaction: string) {
     let binaryClientTransaction = Buffer.from(transaction, 'hex');
+    let binaryClientTransactionBranch = binaryClientTransaction.slice(0,32);
+    let binaryClientTransactionContentsAndSignature = binaryClientTransaction.slice(32);
     // let's compose a binary transaction in mempool format.
     // First, we start with these bytes
     let binaryMempoolTransaction = Buffer.from("000000c9", 'hex');
-    return binaryMempoolTransaction;
     // Then we add the blake hash of the operation (this is not present in the transaction sent from client, not sure why it's here)
-    //binaryMempoolTransaction.append(blake.blake2b(binaryClientTransaction));
-    // then we add the protocol. (Why? mystery.)
-    //queryProtoFromRPC();
-    //binaryMempoolTransction.append(ConvertProtoToBinarySomehow);
-    //then we append the branch (sliced from the client transaction)
-    //then we append these merry bytes: 0000 0078
-    // then we append the actual transactio
-    // then we append these merry bytes: 0000 0005 0500 0000 00
+    const transactionBlakeHash = blake.blake2b(binaryClientTransaction, null, 32);
+    console.log("Blake hash of transaction: ");
+    console.log(JSON.stringify(transactionBlakeHash));
+    console.log("Binary Transaction branch:");
+    console.log(JSON.stringify(binaryClientTransactionBranch));
+    console.log("Binary Transaction contents and signature:");
+    console.log(JSON.stringify(binaryClientTransactionContentsAndSignature));
+
+    binaryMempoolTransaction = Buffer.concat( [binaryMempoolTransaction, transactionBlakeHash ]);
+    binaryMempoolTransaction = Buffer.concat( [binaryMempoolTransaction, Buffer.from("00000020", 'hex') ]);
+    binaryMempoolTransaction = Buffer.concat( [binaryMempoolTransaction, binaryClientTransactionBranch ]);
+    binaryMempoolTransaction = Buffer.concat( [binaryMempoolTransaction, Buffer.from("00000078", 'hex') ]);
+    binaryMempoolTransaction = Buffer.concat( [binaryMempoolTransaction, binaryClientTransactionContentsAndSignature ]);
+    binaryMempoolTransaction = Buffer.concat( [binaryMempoolTransaction, Buffer.from("000000050500000000", 'hex') ]);
+
+
+    return binaryMempoolTransaction;
 }
 
 
@@ -79,7 +89,7 @@ app.get('/chains/main/mempool/monitor_operations', (req, res) => {
           console.log("Found a transaction in flashbake special mempool, injecting it");
           // FIXME: must convert json to binary
           const binaryTransactionToInject = convertTransactionToMempoolBinary(flashbakePool[0]);
-          console.log("Transaction to inject: " + binaryTransactionToInject.toString());
+          console.log("Transaction to inject: " + JSON.stringify(binaryTransactionToInject));
           res.write(binaryTransactionToInject);
       }
       console.log("Injecting");
