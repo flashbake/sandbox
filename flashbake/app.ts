@@ -91,6 +91,7 @@ app.get('/chains/main/mempool/monitor_operations', (req, res) => {
           const binaryTransactionToInject = convertTransactionToMempoolBinary(flashbakePool[0]);
           console.log("Transaction to inject: " + JSON.stringify(binaryTransactionToInject));
           res.write(binaryTransactionToInject);
+          flashbakePool = [] // for now, just empty mempool once one transaction has been injected
       }
       console.log("Injecting");
       res.write(chunk);
