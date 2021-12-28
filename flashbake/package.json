@@ -12,6 +12,7 @@
     "@taquito/utils": "^10.2.1",
     "@types/stream-array": "^1.1.0",
     "blakejs": "^1.1.1",
+    "buffer-hexdump": "^1.0.0",
     "express": "^4.17.1",
     "http-proxy-middleware": "^2.0.1",
     "stream-array": "^1.1.2"

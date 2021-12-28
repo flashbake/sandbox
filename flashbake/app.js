@@ -27,6 +27,7 @@ var http_proxy_middleware_1 = require("http-proxy-middleware");
 var utils_1 = require("@taquito/utils");
 var http = __importStar(require("http"));
 var bodyParser = require('body-parser');
+var dump = require('buffer-hexdump');
 var blake = require('blakejs');
 var app = (0, express_1.default)();
 var port = 10732;
@@ -63,21 +64,21 @@ function convertTransactionToMempoolBinary(transaction) {
     var binaryClientTransactionContentsAndSignature = binaryClientTransaction.slice(32);
     // let's compose a binary transaction in mempool format.
     // First, we start with these bytes
-    var binaryMempoolTransaction = Buffer.from("000000c9", 'hex');
+    var binaryMempoolTransaction = Buffer.from("000000ce000000ca", 'hex');
     // Then we add the blake hash of the operation (this is not present in the transaction sent from client, not sure why it's here)
     var transactionBlakeHash = blake.blake2b(binaryClientTransaction, null, 32);
     console.log("Blake hash of transaction: ");
-    console.log(JSON.stringify(transactionBlakeHash));
+    console.log(dump(transactionBlakeHash));
     console.log("Binary Transaction branch:");
-    console.log(JSON.stringify(binaryClientTransactionBranch));
+    console.log(dump(binaryClientTransactionBranch));
     console.log("Binary Transaction contents and signature:");
-    console.log(JSON.stringify(binaryClientTransactionContentsAndSignature));
+    console.log(dump(binaryClientTransactionContentsAndSignature));
     binaryMempoolTransaction = Buffer.concat([binaryMempoolTransaction, transactionBlakeHash]);
     binaryMempoolTransaction = Buffer.concat([binaryMempoolTransaction, Buffer.from("00000020", 'hex')]);
     binaryMempoolTransaction = Buffer.concat([binaryMempoolTransaction, binaryClientTransactionBranch]);
     binaryMempoolTransaction = Buffer.concat([binaryMempoolTransaction, Buffer.from("00000078", 'hex')]);
     binaryMempoolTransaction = Buffer.concat([binaryMempoolTransaction, binaryClientTransactionContentsAndSignature]);
-    binaryMempoolTransaction = Buffer.concat([binaryMempoolTransaction, Buffer.from("000000050500000000", 'hex')]);
+    binaryMempoolTransaction = Buffer.concat([binaryMempoolTransaction, Buffer.from("00000006060000008a00", 'hex')]);
     return binaryMempoolTransaction;
 }
 // the baker queries the node's mempool in binary format (important)
@@ -94,12 +95,11 @@ app.get('/chains/main/mempool/monitor_operations', function (req, res) {
         // A chunk of data has been received.
         resp.on('data', function (chunk) {
             console.log("Received the following from node's mempool:");
-            console.log(JSON.stringify(chunk));
+            console.log(dump(chunk));
             if (flashbakePool.length > 0) {
                 console.log("Found a transaction in flashbake special mempool, injecting it");
-                // FIXME: must convert json to binary
                 var binaryTransactionToInject = convertTransactionToMempoolBinary(flashbakePool[0]);
-                console.log("Transaction to inject: " + JSON.stringify(binaryTransactionToInject));
+                console.log("Transaction to inject: \n" + dump(binaryTransactionToInject));
                 res.write(binaryTransactionToInject);
                 flashbakePool = []; // for now, just empty mempool once one transaction has been injected
             }
