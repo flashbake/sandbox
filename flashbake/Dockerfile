@@ -1,9 +1,9 @@
-FROM node:8-alpine
+FROM node:16
 
-WORKDIR .
+WORKDIR ./
 
 COPY package*.json ./
-
+COPY *.tgz ./
 RUN npm install
 
 COPY . .

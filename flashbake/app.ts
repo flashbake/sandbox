@@ -2,12 +2,20 @@ import express from 'express';
 import { createProxyMiddleware, Filter, Options, RequestHandler } from 'http-proxy-middleware';
 import { encodeOpHash } from "@taquito/utils";
 import * as http from "http";
+import { Address } from '@flashbake/core';
+import { StubRegistryService } from "@flashbake/relay";
 
-var bodyParser = require('body-parser');
+const logTimestamp = require('log-timestamp');
+const bodyParser = require('body-parser');
 const blake = require('blakejs');
 
-const app = express()
-const port = 10732
+const app = express();
+const port = 10732;
+
+const selfAddress = 'tz1THLWsNuricp4y6fCCXJk5pYazGY1e7vGc';
+const selfEndpointUrl = `http://localhost:${port}/flashbake_injection/operation`;
+const bakerRegistry = new StubRegistryService();
+bakerRegistry.setEndpoint(selfAddress, selfEndpointUrl);
 
 const mempoolProxy = createProxyMiddleware({
     target: 'http://localhost:8732',
@@ -16,20 +24,131 @@ const mempoolProxy = createProxyMiddleware({
 // The flashbake mempool. We push/pop operations from it.
 let flashbakePool: string[] = [];
 
+function getBakingRights(): Address[] {
+  const addresses = new Array<Address>();
+
+  console.log('--- in getBakingRights() --- ');
+
+  const bakerRightsRequestOpts = {
+    hostname: '127.0.0.1',
+    port: 8732,
+    path: 'chains/main/blocks/head/helpers/baking_rights?max_priority',
+    headers: {'accept': 'application/json' }
+  }
+
+  http.get(bakerRightsRequestOpts, (resp) => {
+    const { statusCode } = resp;
+    const contentType = resp.headers['content-type'] || '';
+
+    var error;
+    if (statusCode !== 200) {
+      error = new Error(`Baking rights request failed with status code: ${statusCode}.`);
+    } else if (!/^application\/json/.test(contentType)) {
+      error = new Error(`Baking rights request produced unexpected response content-type ${contentType}.`);
+    }
+    if (error) {
+      console.error(error.message);
+      resp.resume();
+      return;
+    }
+
+    // A chunk of data has been received.
+    var rawData = '';
+    resp.on('data', (chunk) => { rawData += chunk; });
+    resp.on('end', () => {
+      try {
+        console.log("Received the following baking rights response from node's mempool:\n" + rawData);
+        const bakingRights = JSON.parse(rawData) as ({delegate: string})[];
+        for (let bakingRight of bakingRights) {
+          addresses.push(bakingRight.delegate);
+        }
+      } catch (e) {
+        if (typeof e === "string") {
+          console.error(e);
+        } else if (e instanceof Error) {
+          console.error(e.message);
+        }
+      }
+    });
+    }).on("error", (err) => {
+      console.log("Error while querying baker rights: " + err.message);
+    });
+
+    return addresses;
+}
+
 // URL where this daemon receives operations to be directly injected, bypassing mempool
 app.post('/flashbake_injection/operation', bodyParser.text({type:"*/*"}), (req, res) => {
   let transaction = JSON.parse(req.body);
   console.log("flashbake hex-encoded transaction received from client:");
   console.log(transaction);
-  console.log("pushing into flashbake special mempool");
-  flashbakePool.push(transaction);
 
-  // the client expects the transaction hash to be immediately returned
-  console.log("transaction hash:");
-  const opHash = encodeOpHash(JSON.parse(req.body));
-  console.log(opHash);
-  res.json(opHash);
-})
+  // Query upcoming baking rights
+  const addresses = getBakingRights();
+  let endpointUrl = '';
+
+  // Iterate through baking rights to discover the earliest upcoming participating baker
+  for (let address of addresses) {
+    // TODO: this has synchronization issues resulting in non-deterministic endpointUrl value
+    bakerRegistry.getEndpoint(address).then((endpoint) => {
+      if (endpoint) {
+        console.log(`Found endpoint ${endpoint} for address ${address} in flashbake registry.`);
+        endpointUrl = endpoint;
+      }
+    });
+    if (endpointUrl)
+      break;
+  }
+
+  if (!endpointUrl) {
+    console.warn('No flashbake endpoints found for current cycle, using self');
+    endpointUrl = selfEndpointUrl;
+  }
+
+  if (endpointUrl === selfEndpointUrl) {
+    // If earliest upcoming Flashbake participating baker is self, add transaction to local Flashbake pool
+    console.log("pushing into flashbake special mempool");
+    flashbakePool.push(transaction);
+    // the client expects the transaction hash to be immediately returned
+    console.log("transaction hash:");
+    const opHash = encodeOpHash(JSON.parse(req.body));
+    console.log(opHash);
+    res.json(opHash);
+  } else {
+    // ...otherwise relay it to that baker via their /flashbake_injection/operation
+    
+    const relayReq = http.request(endpointUrl, {
+        method: 'POST',
+        headers : {
+          'User-Agent': 'Flashbake-Relay / 0.0.1',
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(req.body)      
+        }
+      }, (resp) => {
+        const { statusCode } = resp;
+    
+        if (statusCode !== 200) {
+          console.error(`Relay request to ${endpointUrl} failed with status code: ${statusCode}.`);
+          resp.resume();
+        }
+    
+        var rawData = '';
+        resp.on('data', (chunk) => { rawData += chunk; });
+        resp.on('end', () => {
+          console.log(`Received the following response from relay ${endpointUrl}:\n${rawData}`);
+          // forwared response to relay client
+          res.write(rawData);
+        })
+      }).on("error", (err) => {
+        console.log(`Error while relaying injection to ${endpointUrl}: ${err.message}`);
+      });
+
+      // relay original request to the remote flashbaker
+      relayReq.write(req.body);
+      relayReq.end();
+    }
+  }
+)
 
 // a function that takes a hex-encoded transaction received from a tezos client
 // and converts it into binary that the baker expects from the /mempool/monitor_operations
