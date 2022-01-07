@@ -4,3 +4,6 @@
 [submodule "flashbake/endpoints-monorepo"]
 	path = flashbake/endpoints-monorepo
 	url = git@github.com:flashbake/endpoints-monorepo.git
+[submodule "flashbake-relay/endpoints-monorepo"]
+	path = flashbake-relay/endpoints-monorepo
+	url = git@github.com:flashbake/endpoints-monorepo.git

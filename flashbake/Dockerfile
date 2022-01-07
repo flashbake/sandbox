@@ -1,8 +1,10 @@
 FROM node:16
 
-WORKDIR ./
+WORKDIR /
 
-COPY . .
+COPY . /
+
+COPY endpoints-monorepo/ /
 
 # build dependencies
 RUN cd ./endpoints-monorepo/core && \

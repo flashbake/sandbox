@@ -4,3 +4,7 @@ images:
     image: tezos-k8s-flashbake
     dockerfile: ./flashbake/Dockerfile
     context: ./flashbake
+  flashbake_relay:
+    image: tezos-k8s-flashbake-relay
+    dockerfile: ./flashbake-relay/Dockerfile
+    context: ./flashbake-relay
