@@ -1,22 +1,30 @@
 import express from 'express';
-import { InMemoryMempool, InMemoryRegistryService, Mempool, RegistryService } from "@flashbake/relay";
-import { HttpRelay } from '@flashbake/baker-endpoint';
+import { Mempool, InMemoryMempool } from "@flashbake/relay";
+import { HttpBakerEndpoint } from '@flashbake/baker-endpoint';
 
 
-const app = express();
-const port = 10732;
+function startBakerEndpoint(relayListenerPort: number, bakerListenerPort: number, rpcApiUrl: string): HttpBakerEndpoint {
+  const relayFacingApp = express();
+  const bakerFacingApp = express();
+  const mempool: Mempool = new InMemoryMempool();
+  const baker = new HttpBakerEndpoint(relayFacingApp, bakerFacingApp, mempool, rpcApiUrl);
 
-const rpcApiUrl = 'http://localhost:8732';
-const selfAddress = 'tz1THLWsNuricp4y6fCCXJk5pYazGY1e7vGc';
-const selfEndpointUrl = `http://localhost:${port}/flashbake_injection/operation`;
-const mempool: Mempool = new InMemoryMempool();
-const bakerRegistry = new InMemoryRegistryService();
+  relayFacingApp.listen(relayListenerPort, () => {
+    console.log(`Baker Endpoint relay-facing listener started on http://localhost:${relayListenerPort}`);
+  }).setTimeout(500000);
+  bakerFacingApp.listen(bakerListenerPort, () => {
+    console.log(`Baker Endpoint baker-facing listener started on http://localhost:${bakerListenerPort}`);
+  }).setTimeout(500000);
 
-bakerRegistry.setEndpoint(selfAddress, selfEndpointUrl);
-export const relayer = new HttpRelay(app, bakerRegistry, mempool, rpcApiUrl, selfEndpointUrl);
+  return baker;
+}
 
-const server = app.listen(port, () => {
-  console.log(`Flashbake relay and endpoint listening at http://localhost:${port}`)
-  console.log(`Advertizing endpoint ${selfEndpointUrl} for address ${selfAddress}`)
-})
-server.setTimeout(500000);
+function main() {
+  const relayListenerPort = 11732;
+  const bakerListenerPort = 12732;
+  const rpcApiUrl = 'http://localhost:8732';
+
+  startBakerEndpoint(relayListenerPort, bakerListenerPort, rpcApiUrl);
+}
+
+main();
