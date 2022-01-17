@@ -34,12 +34,6 @@ Deploy tezos-k8s, flashbake edition:
 helm install -f tezos-k8s-flashbake-values.yaml flashbake tezos-k8s/charts/tezos --namespace flashbake --create-namespace
 ```
 
-Deploy the flashbake relay (which is just a nginx container with some custom config):
-
-```
-kubectl apply -f flashbake-relay-k8s/flashbake-relay.yaml -n flashbake
-```
-
 ## Run a flashbake transaction
 
 Open a shell in octez-node container.
@@ -54,5 +48,5 @@ tezos-client -d /var/tezos/client  transfer 444 from tezos-baking-node-0 to test
 To send a transaction with flashbake, bypassing the mempool, change the endpoint to the flashbake relay:
 
 ```
-tezos-client -d /var/tezos/client --endpoint http://flashbake-relay:8732 transfer 555 from tezos-baking-node-0 to test
+tezos-client -d /var/tezos/client --endpoint http://localhost:10732 transfer 555 from tezos-baking-node-0 to test
 ```
