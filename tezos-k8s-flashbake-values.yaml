@@ -83,6 +83,16 @@ nodes:
     - flashbake_endpoint
     storage_size: 15Gi
   tezos-node: null
+  flashbake-relay:
+    instances:
+    - config:
+        shell:
+          history_mode: archive
+      is_bootstrap_node: true
+    runs:
+    - octez_node
+    - flashbake_relay
+    storage_size: 15Gi
 rolling_snapshot_url: null
 should_generate_unsafe_deterministic_data: false
 zerotier_config:
