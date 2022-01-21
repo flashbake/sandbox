@@ -1,13 +1,23 @@
 accounts:
-  tezos-baking-node-0:
+  flashbake-baker-0:
     bootstrap_balance: '4000000000000'
     is_bootstrap_baker_account: true
     key: edsk34DuVDY1wgvYGTLJpUZj4xDrJPiMzMXc7YoKkNXRYETtDHgocm
     type: secret
-  tezos-baking-node-1:
+  flashbake-baker-1:
     bootstrap_balance: '4000000000000'
     is_bootstrap_baker_account: true
     key: edsk3tJdasZU4x6xtsHuim1e5uamNUyTpHnhJtmbRm4nVmxRFZN8Lt
+    type: secret
+  regular-baker-0:
+    bootstrap_balance: '4000000000000'
+    is_bootstrap_baker_account: true
+    key: edsk46XpQoDkQbmX5LvNpAz1jUT9vhrHfPAJ3xFxV7dKAXpy1eWL2v
+    type: secret
+  regular-baker-1:
+    bootstrap_balance: '4000000000000'
+    is_bootstrap_baker_account: true
+    key: edsk3kbXzTL9GEqpMKruvv8FGPPDbGLqp8Mj4UHPZQTkfSVFNZs8QC
     type: secret
 activation:
   protocol_hash: PsiThaCaT47Zboaw71QWScM8sXeMM7bbQFncK9FLqYc6EKdpjVP
@@ -56,23 +66,23 @@ images:
   octez: tezos/tezos:v12.0-rc1
 is_invitation: false
 node_config_network:
-  activation_account_name: tezos-baking-node-0
+  activation_account_name: flashbake-baker-0
   chain_name: nico
   genesis:
     block: BMJLhTDCS63uzRt8jypNfG7CNLhHXZvSoUNoXNwKevMKb5YS2Gh
     protocol: Ps9mPmXaRzmzk35gbAYNCAw6UXdE2qoABTHbN2oEEc1qM7CwT9P
     timestamp: '2021-10-20T21:02:31.278506+00:00'
 nodes:
-  tezos-baking-node:
+  flashbake-baker:
     instances:
     - bake_using_accounts:
-      - tezos-baking-node-0
+      - flashbake-baker-0
       config:
         shell:
           history_mode: archive
       is_bootstrap_node: true
     - bake_using_accounts:
-      - tezos-baking-node-1
+      - flashbake-baker-1
       config:
         shell:
           history_mode: archive
@@ -81,6 +91,19 @@ nodes:
     - octez_node
     - baker
     - flashbake_endpoint
+    storage_size: 15Gi
+  regular-baker:
+    instances:
+    - bake_using_accounts:
+      - regular-baker-0
+      - regular-baker-1
+      config:
+        shell:
+          history_mode: archive
+      is_bootstrap_node: true
+    runs:
+    - octez_node
+    - baker
     storage_size: 15Gi
   tezos-node: null
   flashbake-relay:
