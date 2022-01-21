@@ -36,7 +36,7 @@ helm install -f tezos-k8s-flashbake-values.yaml flashbake tezos-k8s/charts/tezos
 
 ## Run a flashbake transaction
 
-Open a shell in octez-node container.
+Open a shell in tezos-node-0 pod, octez-node container.
 
 Create a new test account and send tez to it the normal way (via the node mempool):
 
