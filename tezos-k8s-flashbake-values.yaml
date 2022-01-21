@@ -59,6 +59,7 @@ activation:
       numerator: 1
       denominator: 2
     delegate_selection: "random"
+    bootstrap_contract_urls: [ "https://raw.githubusercontent.com/flashbake/proto/bootstrap_contracts/bootstrap_contracts/registry.json" ]
 bootstrap_peers: []
 expected_proof_of_work: 0
 full_snapshot_url: null
