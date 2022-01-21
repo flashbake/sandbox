@@ -48,5 +48,5 @@ tezos-client -d /var/tezos/client  transfer 444 from tezos-baking-node-0 to test
 To send a transaction with flashbake, bypassing the mempool, change the endpoint to the flashbake relay:
 
 ```
-tezos-client -d /var/tezos/client --endpoint http://localhost:10732 transfer 555 from tezos-baking-node-0 to test
+tezos-client -d /var/tezos/client --endpoint http://flashbake-relay-0.flashbake-relay:10732 transfer 555 from tezos-baking-node-0 to test
 ```

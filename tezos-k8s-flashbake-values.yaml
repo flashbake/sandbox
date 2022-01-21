@@ -4,6 +4,11 @@ accounts:
     is_bootstrap_baker_account: true
     key: edsk34DuVDY1wgvYGTLJpUZj4xDrJPiMzMXc7YoKkNXRYETtDHgocm
     type: secret
+  tezos-baking-node-1:
+    bootstrap_balance: '4000000000000'
+    is_bootstrap_baker_account: true
+    key: edsk3tJdasZU4x6xtsHuim1e5uamNUyTpHnhJtmbRm4nVmxRFZN8Lt
+    type: secret
 activation:
   protocol_hash: PsiThaCaT47Zboaw71QWScM8sXeMM7bbQFncK9FLqYc6EKdpjVP
   protocol_parameters:
@@ -66,17 +71,30 @@ nodes:
         shell:
           history_mode: archive
       is_bootstrap_node: true
+    - bake_using_accounts:
+      - tezos-baking-node-1
+      config:
+        shell:
+          history_mode: archive
+      is_bootstrap_node: true
     runs:
     - octez_node
     - baker
+    - flashbake_endpoint
     storage_size: 15Gi
   tezos-node: null
+  flashbake-relay:
+    instances:
+    - config:
+        shell:
+          history_mode: archive
+      is_bootstrap_node: true
+    runs:
+    - octez_node
+    - flashbake_relay
+    storage_size: 15Gi
 rolling_snapshot_url: null
 should_generate_unsafe_deterministic_data: false
-signers:
-  tezos-signer-0:
-    sign_for_accounts:
-    - tezos-baking-node-0
 zerotier_config:
   zerotier_network: null
   zerotier_token: null
