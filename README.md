@@ -50,3 +50,7 @@ To send a transaction with flashbake, bypassing the mempool, change the endpoint
 ```
 tezos-client -d /var/tezos/client --endpoint http://flashbake-relay-0.flashbake-relay:10732 transfer 555 from tezos-baking-node-0 to test
 ```
+
+## Flashbake registry contract
+
+Flashbake registry contract is pre-installed at address KT1VqarPDicMFn1ejmQqqshUkUXTCTXwmkCN. It is not used by the relay yet. (still TODO)
