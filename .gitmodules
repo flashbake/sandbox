@@ -7,3 +7,6 @@
 [submodule "flashbake-relay/endpoints-monorepo"]
 	path = flashbake-relay/endpoints-monorepo
 	url = git@github.com:flashbake/endpoints-monorepo.git
+[submodule "registry-contract"]
+	path = registry-contract
+	url = https://github.com/flashbake/registry-contract
