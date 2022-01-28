@@ -59,7 +59,3 @@ The contracts are deployed at:
 Multisig: KT1CSKPf2jeLpMmrgKquN2bCjBTkAcAdRVDy
 Registry: KT1QuofAgnsWffHzLA7D78rxytJruGHDe7XG
 ```
-
-
-
-Flashbake registry contract is pre-installed at address KT1VqarPDicMFn1ejmQqqshUkUXTCTXwmkCN. It is not used by the relay yet. (still TODO)
