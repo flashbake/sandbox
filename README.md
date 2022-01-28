@@ -50,6 +50,16 @@ To send a transaction with flashbake, bypassing the mempool, change the endpoint
 tezos-client -d /var/tezos/client --endpoint http://flashbake-relay-0.flashbake-relay:10732 transfer 555 from tezos-baking-node-0 to test
 ```
 
-## Flashbake registry contract
+## Flashbake Contracts
+
+A `registry` and `administrator` contract are deployed at Genesis. The `registry` contract contains a mapping of Baker Addresses to Endpoints and collects deposits. The `administrator` contract can administer fees.
+
+The contracts are deployed at:
+```
+Multisig: KT1CSKPf2jeLpMmrgKquN2bCjBTkAcAdRVDy
+Registry: KT1QuofAgnsWffHzLA7D78rxytJruGHDe7XG
+```
+
+
 
 Flashbake registry contract is pre-installed at address KT1VqarPDicMFn1ejmQqqshUkUXTCTXwmkCN. It is not used by the relay yet. (still TODO)
