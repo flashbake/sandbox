@@ -58,14 +58,15 @@ async function startRelay(port: number, rpcApiUrl: string, bakers: Map<string, s
   const relayApp = express();
   const relayer = new HttpRelay(relayApp, bakerRegistry, rpcApiUrl, bakingRightsService);
   const server = relayApp.listen(port, () => {
-    console.log(`Flashbake relay started on http://localhost:${port}`)
-  })
+    blockMonitor.start();
+    console.log(`Flashbake relay started on http://localhost:${port}`);
+  });
   server.setTimeout(500000);
 
   return relayer;
 }
 
-function main() {
+async function main() {
   const relayPort = 10732;
   const bakerPort = 11732;
   const rpcApiUrl = 'http://localhost:8732';
@@ -73,6 +74,7 @@ function main() {
     ['tz1THLWsNuricp4y6fCCXJk5pYazGY1e7vGc', `http://tezos-baking-node-0.tezos-baking-node:${bakerPort}/flashbake/bundle`],
     ['tz1RUyvixHtL1Pwwg41ZB9WKMWTQgC7gs3Z6', `http://tezos-baking-node-1.tezos-baking-node:${bakerPort}/flashbake/bundle`]
   ]);
+
   startRelay(relayPort, rpcApiUrl, bakers);
 }
 

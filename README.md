@@ -35,21 +35,27 @@ helm install -f tezos-k8s-flashbake-values.yaml flashbake tezos-k8s/charts/tezos
 
 ## Run a flashbake transaction
 
-Open a shell in tezos-node-0 pod, octez-node container.
+Open a shell in regular-baker-0 pod, octez-node container.
 
 Create a new test account and send tez to it the normal way (via the node mempool):
 
 ```
 tezos-client -d /var/tezos/client gen keys test
-tezos-client -d /var/tezos/client  transfer 444 from tezos-baking-node-0 to test --burn-cap 0.257
+tezos-client -d /var/tezos/client  transfer 444 from regular-baker-0 to test --burn-cap 0.257
 ```
 
 To send a transaction with flashbake, bypassing the mempool, change the endpoint to the flashbake relay:
 
 ```
-tezos-client -d /var/tezos/client --endpoint http://flashbake-relay-0.flashbake-relay:10732 transfer 555 from tezos-baking-node-0 to test
+tezos-client -d /var/tezos/client --endpoint http://flashbake-relay-0.flashbake-relay:10732 transfer 555 from regular-baker-0 to test
 ```
 
-## Flashbake registry contract
+## Flashbake Contracts
 
-Flashbake registry contract is pre-installed at address KT1VqarPDicMFn1ejmQqqshUkUXTCTXwmkCN. It is not used by the relay yet. (still TODO)
+A `registry` and `administrator` contract are deployed at Genesis. The `registry` contract contains a mapping of Baker Addresses to Endpoints and collects deposits. The `administrator` contract can administer fees.
+
+The contracts are deployed at:
+```
+Multisig: KT1CSKPf2jeLpMmrgKquN2bCjBTkAcAdRVDy
+Registry: KT1QuofAgnsWffHzLA7D78rxytJruGHDe7XG
+```
