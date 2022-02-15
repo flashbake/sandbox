@@ -71,9 +71,9 @@ async function main() {
   const bakerPort = 11732;
   const rpcApiUrl = 'http://localhost:8732';
   const bakers: Map<string, string> = new Map<string, string>([
-    ['tz1THLWsNuricp4y6fCCXJk5pYazGY1e7vGc', `http://tezos-baking-node-0.tezos-baking-node:${bakerPort}/flashbake/bundle`],
-    ['tz1RUyvixHtL1Pwwg41ZB9WKMWTQgC7gs3Z6', `http://tezos-baking-node-1.tezos-baking-node:${bakerPort}/flashbake/bundle`]
-  ]);
+    ['tz1THLWsNuricp4y6fCCXJk5pYazGY1e7vGc', `http://flashbake-baker-0.flashbake-baker:${bakerPort}/flashbake/bundle`],
+    ['tz1RUyvixHtL1Pwwg41ZB9WKMWTQgC7gs3Z6', `http://flashbake-baker-1.flashbake-baker:${bakerPort}/flashbake/bundle`]
+  ])
 
   startRelay(relayPort, rpcApiUrl, bakers);
 }
