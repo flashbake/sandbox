@@ -22,11 +22,6 @@ async function startRelay(port: number, rpcApiUrl: string, bakers: Map<string, s
   // Identify the big map to read data from.
   console.log(`Starting relay connected to node ${rpcApiUrl}`)
   const rpcService = new TaquitoRpcService(rpcApiUrl)
-  const registryBigMapId = await rpcService.getBigMapIdentifier(
-    REGISTRY_CONTRACT_ADDRESS,
-    REGISTRY_BIG_MAP_ANNOTATION
-  )
-  console.log(`Registry Big Map is assigned ID: ${registryBigMapId}`)
 
   // Read all rights for the cycle
   const blockMonitor = new RpcBlockMonitor(rpcApiUrl)
