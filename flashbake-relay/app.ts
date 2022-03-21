@@ -1,7 +1,7 @@
 import express from 'express';
 import {
   CachingBakingRightsService,
-  GenericCycleMonitor,
+  RpcCycleMonitor,
   HttpRelay,
   InMemoryRegistryService,
   RpcBlockMonitor,
@@ -10,13 +10,13 @@ import {
 
 // Configurable parameters that are hardcoded for the prototype
 // TODO(keefertaylor): Refactor these constants to make them configuratble.
-const REGISTRY_CONTRACT_ADDRESS = "KT1QuofAgnsWffHzLA7D78rxytJruGHDe7XG"
-const BLOCKS_PER_CYCLE = 8192
+// const REGISTRY_CONTRACT_ADDRESS = "KT1QuofAgnsWffHzLA7D78rxytJruGHDe7XG"
+// const BLOCKS_PER_CYCLE = 8192
 
 // Flashbake Protocol constants
 
 // The annotation of the big map in the registry contract
-const REGISTRY_BIG_MAP_ANNOTATION = "registry"
+// const REGISTRY_BIG_MAP_ANNOTATION = "registry"
 
 async function startRelay(port: number, rpcApiUrl: string, bakers: Map<string, string>): Promise<HttpRelay> {
   // Identify the big map to read data from.
@@ -25,15 +25,16 @@ async function startRelay(port: number, rpcApiUrl: string, bakers: Map<string, s
 
   // Read all rights for the cycle
   const blockMonitor = new RpcBlockMonitor(rpcApiUrl)
-  const cycleMonitor = new GenericCycleMonitor(Promise.resolve(BLOCKS_PER_CYCLE), blockMonitor)
   const bakingRightsService = new CachingBakingRightsService(
     rpcApiUrl,
-    cycleMonitor,
+    new RpcCycleMonitor(rpcApiUrl, blockMonitor),
   )
-  const bakersAssignedRights = await bakingRightsService.getBakingRights()
-  console.log(`Identified ${bakersAssignedRights.length} bakers in the current cycle`)
 
-  console.log("Syncing the baker's registry")
+  // TODO (DF): migrate from in-memory registry to on-chain contract-based registry
+  // const bakersAssignedRights = await bakingRightsService.getBakingRights()
+  // console.log(`Identified ${bakersAssignedRights.length} bakers in the current cycle`)
+
+  // console.log("Syncing the baker's registry")
   const bakerRegistry = new InMemoryRegistryService();
   await bakerRegistry.initialize()
 
@@ -42,13 +43,13 @@ async function startRelay(port: number, rpcApiUrl: string, bakers: Map<string, s
     console.log(`Relaying to ${bakerEndpointUrl} for address ${bakerAddress}`)
   })
 
-  // For each baker, query the flashbake contract
-  for (let i = 0; i < bakersAssignedRights.length; i++) {
-    const value = await rpcService.getBigMapValue(REGISTRY_CONTRACT_ADDRESS, REGISTRY_BIG_MAP_ANNOTATION, bakersAssignedRights[i])
-    if (value !== undefined) {
-      console.log(`Got value ${value}`)
-    }
-  }
+  // // For each baker, query the flashbake contract
+  // for (let i = 0; i < bakersAssignedRights.length; i++) {
+  //   const value = await rpcService.getBigMapValue(REGISTRY_CONTRACT_ADDRESS, REGISTRY_BIG_MAP_ANNOTATION, bakersAssignedRights[i])
+  //   if (value !== undefined) {
+  //     console.log(`Got value ${value}`)
+  //   }
+  // }
 
   const relayApp = express();
   const relayer = new HttpRelay(relayApp, bakerRegistry, rpcApiUrl, bakingRightsService);
