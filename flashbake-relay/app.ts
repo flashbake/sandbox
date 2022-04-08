@@ -30,7 +30,7 @@ async function startRelay(port: number, rpcApiUrl: string): Promise<HttpRelay> {
   bakerRegistry.initialize()
 
   const relayApp = express();
-  const relayer = new HttpRelay(relayApp, bakerRegistry, rpcApiUrl, bakingRightsService);
+  const relayer = new HttpRelay(relayApp, bakerRegistry, rpcApiUrl, bakingRightsService, blockMonitor, 0);
   const server = relayApp.listen(port, () => {
     blockMonitor.start();
     console.log(`Flashbake relay started on http://localhost:${port}`);
