@@ -2,12 +2,12 @@ accounts:
   flashbake-baker-0:
     bootstrap_balance: '4000000000000'
     is_bootstrap_baker_account: true
-    key: edsk34DuVDY1wgvYGTLJpUZj4xDrJPiMzMXc7YoKkNXRYETtDHgocm
+    key: edsk3tJdasZU4x6xtsHuim1e5uamNUyTpHnhJtmbRm4nVmxRFZN8Lt
     type: secret
   flashbake-baker-1:
     bootstrap_balance: '4000000000000'
     is_bootstrap_baker_account: true
-    key: edsk3tJdasZU4x6xtsHuim1e5uamNUyTpHnhJtmbRm4nVmxRFZN8Lt
+    key: edsk34DuVDY1wgvYGTLJpUZj4xDrJPiMzMXc7YoKkNXRYETtDHgocm
     type: secret
   regular-baker-0:
     bootstrap_balance: '4000000000000'
