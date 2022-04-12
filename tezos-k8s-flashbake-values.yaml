@@ -1,23 +1,27 @@
 accounts:
   flashbake-baker-0:
+    # tz1fboti4soXCzGKXK5WfEEpHxPi59WoRoQY
     bootstrap_balance: '4000000000000'
     is_bootstrap_baker_account: true
-    key: edsk3tJdasZU4x6xtsHuim1e5uamNUyTpHnhJtmbRm4nVmxRFZN8Lt
+    key: edsk3E2YCb56fN9TiHL5JRR6xNXrBcWt35fSSEmz3Qh2KR9CgjJD1s
     type: secret
   flashbake-baker-1:
+    # tz1fb1RzVWyrkPb6BBWR7D1hf3GyWzGifraf
     bootstrap_balance: '4000000000000'
     is_bootstrap_baker_account: true
-    key: edsk34DuVDY1wgvYGTLJpUZj4xDrJPiMzMXc7YoKkNXRYETtDHgocm
+    key: edsk2iAy5Ldv4pSGMa6xhfZpteYrbVVNrUqeQRW2wQuVFCdeovGWNy
     type: secret
   regular-baker-0:
+    # tz1RboUV4wePuCRgd9gWHozaGnpsGo7sKouw
     bootstrap_balance: '4000000000000'
     is_bootstrap_baker_account: true
-    key: edsk46XpQoDkQbmX5LvNpAz1jUT9vhrHfPAJ3xFxV7dKAXpy1eWL2v
+    key: edsk46SU6GdQLmUuEDZhk9LDAtY5HuAV8F4QRcyTxWt58R4UKq4cPm
     type: secret
   regular-baker-1:
+    # tz1Rb1cTbq4KXzjkVU8zMFNhMosqFgxi6D2h
     bootstrap_balance: '4000000000000'
     is_bootstrap_baker_account: true
-    key: edsk3kbXzTL9GEqpMKruvv8FGPPDbGLqp8Mj4UHPZQTkfSVFNZs8QC
+    key: edsk3TtB3khnR7oMGsyyQMET72GzSwEjwXf1bU1hM1yzWt1hBYLMCH
     type: secret
 activation:
   protocol_hash: Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A
