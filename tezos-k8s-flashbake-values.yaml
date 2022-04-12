@@ -65,7 +65,6 @@ activation:
   ]
 bootstrap_peers: []
 expected_proof_of_work: 0
-full_snapshot_url: null
 images:
   octez: tezos/tezos:v12.3
 is_invitation: false
@@ -77,6 +76,7 @@ node_config_network:
     protocol: Ps9mPmXaRzmzk35gbAYNCAw6UXdE2qoABTHbN2oEEc1qM7CwT9P
     timestamp: '2021-10-20T21:02:31.278506+00:00'
 nodes:
+  rolling-node: null
   flashbake-baker:
     instances:
     - bake_using_accounts:
@@ -120,7 +120,6 @@ nodes:
     - octez_node
     - flashbake_relay
     storage_size: 15Gi
-rolling_snapshot_url: null
 should_generate_unsafe_deterministic_data: false
 zerotier_config:
   zerotier_network: null
@@ -130,5 +129,10 @@ protocols:
   - command: 012-Psithaca
 
 tezos_k8s_images:
-  utils: oxheadalpha/tezos-k8s-utils:5.3.1
+  utils: oxheadalpha/tezos-k8s-utils:6.4.0
   flashbake: localhost/tezos-k8s-flashbake:dev
+  flashbake_relay: localhost/tezos-k8s-flashbake-relay:dev
+
+full_snapshot_url: null
+rolling_snapshot_url: null
+archive_tarball_url: null

@@ -40,14 +40,14 @@ Open a shell in regular-baker-0 pod, octez-node container.
 Create a new test account and send tez to it the normal way (via the node mempool):
 
 ```
-tezos-client -d /var/tezos/client gen keys test
-tezos-client -d /var/tezos/client  transfer 444 from regular-baker-0 to test --burn-cap 0.257
+tezos-client gen keys test
+tezos-client transfer 444 from regular-baker-0 to test --burn-cap 0.257
 ```
 
 To send a transaction with flashbake, bypassing the mempool, change the endpoint to the flashbake relay:
 
 ```
-tezos-client -d /var/tezos/client --endpoint http://flashbake-relay-0.flashbake-relay:10732 transfer 555 from regular-baker-0 to test
+tezos-client --endpoint http://flashbake-relay-0.flashbake-relay:10732 transfer 555 from regular-baker-0 to test
 ```
 
 ## Flashbake Contracts
