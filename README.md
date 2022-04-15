@@ -7,7 +7,7 @@ This repo contains a prototype consisting of a self-contained Tezos private chai
 
 Upon deployment, you will have:
 
-* two Flashbake-capable bakers (or /Flashbakers/)  with a **flashbake endpoint** exposing:
+* two Flashbake-capable bakers (or *Flashbakers*)  with a **flashbake endpoint** exposing:
   * an injection endpoint for the flashbake relay to inject operations directly into the node, bypassing mempool
   * an endpoint for the baker to query an external mempool
 * two regular (non-flashbake) bakers. The stake distribution is equal between flashbakers and regular bakers
