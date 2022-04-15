@@ -1,25 +1,28 @@
 Flashbake prototype
 ===================
 
-Consists of:
+[Flashbake](https://forum.tezosagora.org/t/announcing-flashbake-an-initiative-to-tackle-bpev-on-tezos/4006) aims at exploring the problems of Block Producer Extractable Value on Tezos.
 
-* a typescript **flashbake endpoint** with:
-  * an injection endpoint for a tezos client to push an operation to an internal flashbake mempool
-  * logic to intercept mempool transmission between node and baker, injecting an operation from the flashbake mempool if any are present,
-  * proxies any other request from baker to node
-* a typescript **flashbake relay**, forwarding most queries to an actual tezos RPC, except the inject operation which goes to the flashbake endpoint
-* a fork of tezos-k8s that hosts the flashbake endpoint as a proxy between node and baker
+This repo contains a prototype consisting of a self-contained Tezos private chain running Flashbake. It can be deployed locally on a laptop with minikube and helm.
 
-This prototype does not have:
+Upon deployment, you will have:
 
-* pruning of old operations
-* an auction mechanism that compares fees and only injects the highest fee.
+* two Flashbake-capable bakers (or /Flashbakers/)  with a **flashbake endpoint** exposing:
+  * an injection endpoint for the flashbake relay to inject operations directly into the node, bypassing mempool
+  * an endpoint for the baker to query an external mempool
+* two regular (non-flashbake) bakers. The stake distribution is equal between flashbakers and regular bakers
+* a **flashbake relay**, forwarding most queries to an actual tezos RPC, except the inject operation which goes to the flashbake endpoint of the next flashbaker. The relay is backed by a dedicated tezos node.
+* an **on-chain registry contract** where flashbakers can register their endpoints
 
 ## How to deploy the prototype locally
 
-You need minikube and devspace.
+You need minikube, helm and devspace.
 
-Clone this repo's submodules.
+Clone this repo's submodules:
+
+```
+git submodule update --init
+```
 
 Build the flashbake container into your minikube instance:
 
@@ -37,6 +40,8 @@ helm install -f tezos-k8s-flashbake-values.yaml flashbake tezos-k8s/charts/tezos
 
 Open a shell in regular-baker-0 pod, octez-node container.
 
+From within the container, you have access to the baker's funds. The account alias is `regular-baker-0`.
+
 Create a new test account and send tez to it the normal way (via the node mempool):
 
 ```
@@ -44,10 +49,154 @@ tezos-client gen keys test
 tezos-client transfer 444 from regular-baker-0 to test --burn-cap 0.257
 ```
 
+Observe the transaction going through instantly (block times are 5 seconds).
+
 To send a transaction with flashbake, bypassing the mempool, change the endpoint to the flashbake relay:
 
 ```
 tezos-client --endpoint http://flashbake-relay-0.flashbake-relay:10732 transfer 555 from regular-baker-0 to test
+```
+
+Observe the transaction going through, but slower than previously: only half of the bakers are flashbakers, you must wait until it is a flashbaker's time to bake.
+
+## Verify mempool bypass
+
+Forward any node's RPC port (8732) locally. With k9s, select an `octez-node` then press Shift-F and enter 3 times.
+
+The endpoint `/chains/main/mempool/monitor_operations` streams the mempool operations as they come, but it closes the connection at every block. To store all mempool operations in a file, run in a new terminal on your machine:
+
+```
+while true; do curl -s http://localhost:8732/chains/main/mempool/monitor_operations; done > mempool &
+```
+
+Then, back in k9s, open a shell again to `regular-baker-0` and run the same operations again:
+
+```
+tezos-client transfer 444 from regular-baker-0 to test
+```
+
+The output of the transaction should show the operation hash:
+
+```
+Node is bootstrapped.
+Estimated gas: 1420.040 units (will add 100 for safety)
+Estimated storage: no bytes added
+Operation successfully injected in the node.
+Operation hash is 'onhHbaKDnzVKyMMF1gUgxgE63BnPuHtJnxbQikyaxsLFyB7hGb5'
+Waiting for the operation to be included...
+```
+
+Back in your terminal window that is monitoring the mempool, grep the operation hash against the mempool file. You should get a match:
+
+```
+nochem@fedora /tmp $ grep onhHbaKDnzVKyMMF1gUgxgE63BnPuHtJnxbQikyaxsLFyB7hGb5 mempool
+[{"hash":"onhHbaKDnzVKyMMF1gUgxgE63BnPuHtJnxbQikyaxsLFyB7hGb5","protocol":"Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A","branch":"BL5z4pBBzfgJzcPWLpPbTGKTRsCgXW9dPEx7sRrNHVp76kA5EVN","contents":[{"kind":"transaction","source":"tz1RboUV4wePuCRgd9gWHozaGnpsGo7sKouw","fee":"405","counter":"8","gas_limit":"1521","storage_limit":"0","amount":"44
+4000000","destination":"tz1RSXyZktt71oeP624wXsyvSYrGWpTfcb53"}],"signature":"sigcHJYyQvADa1LGEeNbFtZ8yj2X1
+```
+
+Then back into k9s, run the flashbake operation again:
+
+```
+tezos-client --endpoint http://flashbake-relay-0.flashbake-relay:10732 transfer 555 from regular-baker-0 to test
+```
+
+Grab the operation hash from the output:
+```
+Node is bootstrapped.
+Estimated gas: 1420.040 units (will add 100 for safety)
+Estimated storage: no bytes added
+Operation successfully injected in the node.
+Operation hash is 'ooSivkZagBEa8EP2WvgrRBq8rUzHueGdTCsFgGyS7NMFtLeZ6wE'
+```
+
+Grep the operation hash against the mempool file. There is no match. The operation bypassed the mempool.
+
+```
+nochem@fedora /tmp $ grep ooSivkZagBEa8EP2WvgrRBq8rUzHueGdTCsFgGyS7NMFtLeZ6wE mempool
+nochem@fedora /tmp $
+```
+
+## Flashbake relay
+
+Let's observe the logs of the flashbake relay:
+
+```
+│ New cycle 0 started.                                                                                                                                                              │
+│ New cycle started, refreshing baking rights assignments.                                                                                                                          │
+│ Baker of block level 2 at 2022-04-15T00:56:35Z was tz1fb1RzVWyrkPb6BBWR7D1hf3GyWzGifraf                                                                                           │
+│ Baker of block level 3 at 2022-04-15T00:56:40Z was tz1RboUV4wePuCRgd9gWHozaGnpsGo7sKouw                                                                                           │
+│ Baker of block level 4 at 2022-04-15T00:56:45Z was tz1fb1RzVWyrkPb6BBWR7D1hf3GyWzGifraf                                                                                           │
+│ Baker of block level 5 at 2022-04-15T00:56:50Z was tz1Rb1cTbq4KXzjkVU8zMFNhMosqFgxi6D2h                                                                                           │
+│ Baker of block level 6 at 2022-04-15T00:56:55Z was tz1fb1RzVWyrkPb6BBWR7D1hf3GyWzGifraf                                                                                           │
+│ Baker of block level 7 at 2022-04-15T00:57:00Z was tz1fboti4soXCzGKXK5WfEEpHxPi59WoRoQY                                                                                           │
+│ Baker of block level 8 at 2022-04-15T00:57:05Z was tz1Rb1cTbq4KXzjkVU8zMFNhMosqFgxi6D2h                                                                                           │
+│ Baker of block level 9 at 2022-04-15T00:57:10Z was tz1RboUV4wePuCRgd9gWHozaGnpsGo7sKouw                                                                                           │
+│ Baker of block level 10 at 2022-04-15T00:57:15Z was tz1Rb1cTbq4KXzjkVU8zMFNhMosqFgxi6D2h        
+```
+
+The relay is attached to a non-baking node and monitors all the blocks.
+
+For convenience during the demo, we are using vanity accounts to designate bakers:
+
+| | |
+|-|-|
+|Flashbaker 0 | `tz1fbo...`|
+|Flashbaker 1 | `tz1fb1...`|
+|Regular baker 0| `tz1Rbo...`|
+|Regular baker 1| `tz1Rb1...`|
+
+The first thing the relay does is query the contract for the current manifest of flashbake endpoints.
+
+Then it queries the block assignments for the current cycle.
+
+The client targets the flashbake relay as its endpoint. The relay forwards all RPC requests to its backing node except the injection operation.
+
+When it receives an injection operation, here is what happens:
+
+```
+│ Baker of block level 11 at 2022-04-15T00:57:20Z was tz1RboUV4wePuCRgd9gWHozaGnpsGo7sKouw                                                                                          │
+│ Flashbake transaction received from client                                                                                                                                        │
+│ Found endpoint http://flashbake-baker-0.flashbake-baker:11732/flashbake/bundle for baker tz1fboti4soXCzGKXK5WfEEpHxPi59WoRoQY in flashbake registry.                              │
+│ Next flashbaker tz1fboti4soXCzGKXK5WfEEpHxPi59WoRoQY will bake at level 13, sending bundle.                                                                                       │
+│ Baker of block level 12 at 2022-04-15T00:57:25Z was tz1Rb1cTbq4KXzjkVU8zMFNhMosqFgxi6D2h                                                                                          │
+│ Transaction hash ooFhAeMhy3YHKH9wUXupTu2tEGdmV8iShhFiznMC7Wy9EfgyBMG not detected, resending the bundle.                                                                          │
+│ Found endpoint http://flashbake-baker-0.flashbake-baker:11732/flashbake/bundle for baker tz1fboti4soXCzGKXK5WfEEpHxPi59WoRoQY in flashbake registry.                              │
+│ Next flashbaker tz1fboti4soXCzGKXK5WfEEpHxPi59WoRoQY will bake at level 13, sending bundle.                                                                                       │
+│ Baker of block level 13 at 2022-04-15T00:57:30Z was tz1fboti4soXCzGKXK5WfEEpHxPi59WoRoQY                                                                                          │
+│ Relayed bundle identified by operation hash ooFhAeMhy3YHKH9wUXupTu2tEGdmV8iShhFiznMC7Wy9EfgyBMG found on-chain.                                                                   │
+│ 0 bundles remain pending.                                                               
+```
+
+The node figures which is the next flashbaker, assembles the transaction into a "Bundle", then sends it. For now, a bundle contains just one transaction. In a future iteration of flashbake, bundles will contain several of them.
+
+At every block, regardless of baker, it monitors the operations to figure if the block has been included. If not, it keeps sending it to the next flashbaker until it is.
+
+## Flashbake endpoints
+
+```
+│ Adding incoming bundle to Flashbake mempool. Number of bundles in pool: 1                                                                                                         │
+│ Adding incoming bundle to Flashbake mempool. Number of bundles in pool: 1                                                                                                         │
+│ Incoming operations-pool request from baker.                                                                                                                                      │
+│ Out of 1 bundles, #0 is winning the auction with a fee of 500000 mutez.                                                                                                           │
+│ Exposing the following data to the external operations pool:                                                                                                                      │
+│ [                                                                                                                                                                                 │
+│   {                                                                                                                                                                               │
+│     "branch": "BME2hzXKLF1A1bRxKGH5u92KXG344bkui7orAwcTBDCf7pYe4p2",                                                                                                              │
+│     "contents": [                                                                                                                                                                 │
+│       {                                                                                                                                                                           │
+│         "kind": "transaction",                                                                                                                                                    │
+│         "source": "tz1RboUV4wePuCRgd9gWHozaGnpsGo7sKouw",                                                                                                                         │
+│         "fee": "500000",                                                                                                                                                          │
+│         "counter": "7",                                                                                                                                                           │
+│         "gas_limit": "1521",                                                                                                                                                      │
+│         "storage_limit": "0",                                                                                                                                                     │
+│         "amount": "555000000",                                                                                                                                                    │
+│         "destination": "tz1RSXyZktt71oeP624wXsyvSYrGWpTfcb53"                                                                                                                     │
+│       }                                                                                                                                                                           │
+│     ],                                                                                                                                                                            │
+│     "signature": "edsigthC1nxCvcvzPs7qNjGNcsyPwGw179izUbYGXwg75xujKpBUmxRswNQJRP5xjxY3D4RJbDcKz52RPRpzfHpt2ZZuv31BWPD"                                                            │
+│   }                                                                                                                                                                               │
+│ ]                                                                                                     
 ```
 
 ## Flashbake Contracts
@@ -58,4 +207,5 @@ The contracts are deployed at:
 ```
 Multisig: KT1CSKPf2jeLpMmrgKquN2bCjBTkAcAdRVDy
 Registry: KT1QuofAgnsWffHzLA7D78rxytJruGHDe7XG
-```
+3qatHSMM4koAmtiGutLK9qfSLugKYN1aURjoPQX1wvE4XE3pVSZYn"}]
+``
