@@ -36,6 +36,15 @@ Deploy tezos-k8s, flashbake edition:
 helm install -f tezos-k8s-flashbake-values.yaml flashbake tezos-k8s/charts/tezos --namespace flashbake --create-namespace
 ```
 
+We recommend a tool like k9s to visualize the contents of your cluster.
+
+You can see 4 pods in the newly created flashbake namespace:
+* flashbake-baker-0 and 1: flashbake-capable baker with a flashbake endpoint container running in the pod
+* regular-baker-0: tezos-k8s node and baker processes in a pod
+* flashbake-relay: pod containing a tezos-node (non-baking) and a flashbake relay process
+
+The "activation" job  injects a genesis block and your chain starts producing blocks.
+
 ## Run a flashbake transaction
 
 Open a shell in regular-baker-0 pod, octez-node container.
