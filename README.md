@@ -130,6 +130,7 @@ The contract code is located in this repository: [registry-contract](https://git
 
 ## Flashbake relay
 
+The source code for the relay and endpoint is in the [endpoints-monorepo](https://github.com/flashbake/endpoints-monorepo).
 
 Let's observe the logs of the flashbake relay:
 
