@@ -116,7 +116,20 @@ nochem@fedora /tmp $ grep ooSivkZagBEa8EP2WvgrRBq8rUzHueGdTCsFgGyS7NMFtLeZ6wE me
 nochem@fedora /tmp $
 ```
 
+## Flashbake Contracts
+
+A `registry` and `administrator` contract are deployed at Genesis. The `registry` contract contains a mapping of Baker Addresses to Endpoints and collects deposits. The `administrator` contract can administer fees.
+
+The contracts are deployed at:
+```
+Multisig: KT1CSKPf2jeLpMmrgKquN2bCjBTkAcAdRVDy
+Registry: KT1QuofAgnsWffHzLA7D78rxytJruGHDe7XG
+```
+
+The contract code is located in this repository: [registry-contract](https://github.com/flashbake/registry-contract).
+
 ## Flashbake relay
+
 
 Let's observe the logs of the flashbake relay:
 
@@ -145,7 +158,7 @@ For convenience during the demo, we are using vanity accounts to designate baker
 |Regular baker 0| `tz1Rbo...`|
 |Regular baker 1| `tz1Rb1...`|
 
-The first thing the relay does is query the contract for the current manifest of flashbake endpoints.
+The first thing the relay does is query the registry contract for the current list of flashbakers and their endpoints. The registry contract address is set in the relay's configuration.
 
 Then it queries the block assignments for the current cycle.
 
@@ -171,9 +184,11 @@ The node figures which is the next flashbaker, assembles the transaction into a 
 
 At every block, regardless of baker, it monitors the operations to figure if the block has been included. If not, it keeps sending it to the next flashbaker until it is.
 
+Anyone can run a relay.
+
 ## Flashbake endpoints
 
-The flashbake endpoint listens to 2 ports: baker port and relay port.
+The flashbake endpoint is set up by the baker as an auxiliary service. It listens to 2 ports: baker port and relay port.
 
 It puts incoming bundles to the flashbake mempool. When receiving a request from the baker, it returns the bundle containing the transaction with the highest fee.
 
@@ -203,7 +218,7 @@ It puts incoming bundles to the flashbake mempool. When receiving a request from
 │ ]                                                                                                     
 ```
 
-## Auction
+## Auction demo
 
 From regular-baker-0, send 2 Flashbake transactions in quick succession, with increasing fees:
 
@@ -249,15 +264,3 @@ The endpoint indeed receives 2 bundles, and picks the one with a fee of 0.8:
 │   }                                                                                                                                               │
 │ ]                                                                                                                  
 ```
-
-
-## Flashbake Contracts
-
-A `registry` and `administrator` contract are deployed at Genesis. The `registry` contract contains a mapping of Baker Addresses to Endpoints and collects deposits. The `administrator` contract can administer fees.
-
-The contracts are deployed at:
-```
-Multisig: KT1CSKPf2jeLpMmrgKquN2bCjBTkAcAdRVDy
-Registry: KT1QuofAgnsWffHzLA7D78rxytJruGHDe7XG
-3qatHSMM4koAmtiGutLK9qfSLugKYN1aURjoPQX1wvE4XE3pVSZYn"}]
-``
