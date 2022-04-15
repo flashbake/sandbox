@@ -173,6 +173,10 @@ At every block, regardless of baker, it monitors the operations to figure if the
 
 ## Flashbake endpoints
 
+The flashbake endpoint listens to 2 ports: baker port and relay port.
+
+It puts incoming bundles to the flashbake mempool. When receiving a request from the baker, it returns the bundle containing the transaction with the highest fee.
+
 ```
 │ Adding incoming bundle to Flashbake mempool. Number of bundles in pool: 1                                                                                                         │
 │ Adding incoming bundle to Flashbake mempool. Number of bundles in pool: 1                                                                                                         │
@@ -198,6 +202,54 @@ At every block, regardless of baker, it monitors the operations to figure if the
 │   }                                                                                                                                                                               │
 │ ]                                                                                                     
 ```
+
+## Auction
+
+From regular-baker-0, send 2 Flashbake transactions in quick succession, with increasing fees:
+
+```
+~ $ tezos-client --endpoint http://flashbake-relay-0.flashbake-relay:10732 transfer 2 from regular-baker-0 to test --fee 0.5 &
+~ $ tezos-client --endpoint http://flashbake-relay-0.flashbake-relay:10732 transfer 2 from regular-baker-1 to test --fee 0.8 &
+```
+
+Observe that the second transaction with the higher fee completes faster:
+
+```
+[2]+  Done                       tezos-client --endpoint http://flashbake-relay-0.flashbake-relay:10732 transfer 2 from regular-baker-1 to test --fee 0.8
+[1]+  Done                       tezos-client --endpoint http://flashbake-relay-0.flashbake-relay:10732 transfer 2 from regular-baker-0 to test --fee 0.5
+```
+
+The relay just forwards all of the transactions sent its way to the next flashbaker endpoint.
+
+The endpoint indeed receives 2 bundles, and picks the one with a fee of 0.8:
+
+```
+│ Adding incoming bundle to Flashbake mempool. Number of bundles in pool: 1                                                                         │
+│ Adding incoming bundle to Flashbake mempool. Number of bundles in pool: 1                                                                         │
+│ Adding incoming bundle to Flashbake mempool. Number of bundles in pool: 2                                                                         │
+│ Incoming operations-pool request from baker.                                                                                                      │
+│ Out of 2 bundles, #1 is winning the auction with a fee of 800000 mutez.                                                                           │
+│ Exposing the following data to the external operations pool:                                                                                      │
+│ [                                                                                                                                                 │
+│   {                                                                                                                                               │
+│     "branch": "BLG9Rj7r6dJfYKiWsPV3BMWAz2FzMDZcEwicni5Dek3Bn1LkexR",                                                                              │
+│     "contents": [                                                                                                                                 │
+│       {                                                                                                                                           │
+│         "kind": "transaction",                                                                                                                    │
+│         "source": "tz1Rb1cTbq4KXzjkVU8zMFNhMosqFgxi6D2h",                                                                                         │
+│         "fee": "800000",                                                                                                                          │
+│         "counter": "1",                                                                                                                           │
+│         "gas_limit": "1521",                                                                                                                      │
+│         "storage_limit": "0",                                                                                                                     │
+│         "amount": "2000000",                                                                                                                      │
+│         "destination": "tz1asRQmb4NYBo4diURCLddrVxnPEQ6iHFGn"                                                                                     │
+│       }                                                                                                                                           │
+│     ],                                                                                                                                            │
+│     "signature": "edsigu5oznSdkYDaQLnzMPKWqLwNU1PeQUzCfER7xMKAY8dLrqSBFwM6qRdbRZ5EfQy3XokHb6UJ2rmWKbsSFct7EB16jZtPGnB"                            │
+│   }                                                                                                                                               │
+│ ]                                                                                                                  
+```
+
 
 ## Flashbake Contracts
 
