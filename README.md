@@ -1,4 +1,4 @@
-Flashbake prototype
+ prototype
 ===================
 
 [Flashbake](https://forum.tezosagora.org/t/announcing-flashbake-an-initiative-to-tackle-bpev-on-tezos/4006) aims at exploring the problems of Block Producer Extractable Value on Tezos.
@@ -16,18 +16,12 @@ Upon deployment, you will have:
 
 ## How to deploy the prototype locally
 
-You need minikube, helm and devspace.
+You need minikube and helm.
 
 Clone this repo's submodules:
 
 ```
 git submodule update --init
-```
-
-Build the flashbake container into your minikube instance:
-
-```
-devspace build -t dev --skip-push
 ```
 
 Deploy tezos-k8s, flashbake edition:
