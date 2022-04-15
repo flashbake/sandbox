@@ -134,8 +134,8 @@ protocols:
 
 tezos_k8s_images:
   utils: oxheadalpha/tezos-k8s-utils:6.4.0
-  flashbake: ghcr.io/flashbake/flashbake:1.1
-  flashbake_relay: ghcr.io/flashbake/flashbake-relay:1.1
+  flashbake: ghcr.io/flashbake/flashbake:1.2
+  flashbake_relay: ghcr.io/flashbake/flashbake-relay:1.2
 
 full_snapshot_url: null
 rolling_snapshot_url: null
