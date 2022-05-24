@@ -16,6 +16,8 @@
   "dependencies": {
     "@flashbake/baker-endpoint": "file:endpoints-monorepo/baker-endpoint",
     "@flashbake/relay": "file:endpoints-monorepo/relay",
+    "@taquito/taquito": "^12.1.1",
+    "@taquito/utils": "^12.1.1",
     "express": "^4.17.2"
   },
   "devDependencies": {
