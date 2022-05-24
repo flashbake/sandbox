@@ -42,8 +42,7 @@ async function startRelay(port: number, rpcApiUrl: string): Promise<HttpRelay> {
 
 async function main() {
   const relayPort = 10732;
-  const bakerPort = 11732;
-  const rpcApiUrl = 'http://localhost:8732';
+  const rpcApiUrl = 'http://flashbake-relay-node-0.flashbake-relay-node:8732';
 
   startRelay(relayPort, rpcApiUrl);
 }

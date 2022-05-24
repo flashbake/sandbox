@@ -30,18 +30,24 @@ Build the flashbake container into your minikube instance:
 devspace build -t dev --skip-push
 ```
 
-Deploy tezos-k8s, flashbake edition:
+Next, we deploy 4 charts: one is running a private Tezos chain with `tezos-k8s`, the others are running two flashbake endpoints and one flashbake relay:
 
 ```
-helm install -f tezos-k8s-flashbake-values.yaml flashbake tezos-k8s/charts/tezos --namespace flashbake --create-namespace
+helm install -f tezos-k8s-flashbake-values.yaml flashbake tezos-k8s/charts/tezos --namespace flashbake --create-namespace && \
+helm install -f flashbake-endpoint-values-0.yaml flashbake-endpoint-0 charts/flashbake-endpoint/ --namespace flashbake && \
+helm install -f flashbake-endpoint-values-1.yaml flashbake-endpoint-1 charts/flashbake-endpoint/ --namespace flashbake && \
+helm install -f flashbake-relay-values.yaml flashbake-relay charts/flashbake-relay/ --namespace flashbake
 ```
+
 
 We recommend a tool like k9s to visualize the contents of your cluster.
 
-You can see 4 pods in the newly created flashbake namespace:
-* flashbake-baker-0 and 1: flashbake-capable baker with a flashbake endpoint container running in the pod
-* regular-baker-0: tezos-k8s node and baker processes in a pod
-* flashbake-relay: pod containing a tezos-node (non-baking) and a flashbake relay process
+You can see 7 pods in the newly created flashbake namespace:
+* flashbake-baker-0-0 and -1: flashbake-capable nodes and bakers
+* flashbake-endpoint-0 and -1: endpoints for the flashbake-capable bakers above
+* regular-baker-0: regular (non flashbake-capable) node and bakers for illustrative purposes
+* flashbake-relay-node: pod containing a tezos-node (non-baking) used by the flashake relay
+* flashbake-relay: the flashbake relay using the node above as backend
 
 The "activation" job  injects a genesis block and your chain starts producing blocks.
 
@@ -63,7 +69,7 @@ Observe the transaction going through instantly (block times are 5 seconds).
 To send a transaction with flashbake, bypassing the mempool, change the endpoint to the flashbake relay:
 
 ```
-tezos-client --endpoint http://flashbake-relay-0.flashbake-relay:10732 transfer 555 from regular-baker-0 to test
+tezos-client --endpoint http://flashbake-relay:10732 transfer 555 from regular-baker-0 to test
 ```
 
 Observe the transaction going through, but slower than previously: only half of the bakers are flashbakers, you must wait until it is a flashbaker's time to bake.
@@ -106,7 +112,7 @@ nochem@fedora /tmp $ grep onhHbaKDnzVKyMMF1gUgxgE63BnPuHtJnxbQikyaxsLFyB7hGb5 me
 Then back into k9s, run the flashbake operation again:
 
 ```
-tezos-client --endpoint http://flashbake-relay-0.flashbake-relay:10732 transfer 555 from regular-baker-0 to test
+tezos-client --endpoint http://flashbake-relay:10732 transfer 555 from regular-baker-0 to test
 ```
 
 Grab the operation hash from the output:
@@ -233,15 +239,15 @@ It puts incoming bundles to the flashbake mempool. When receiving a request from
 From regular-baker-0, send 2 Flashbake transactions in quick succession, with increasing fees:
 
 ```
-~ $ tezos-client --endpoint http://flashbake-relay-0.flashbake-relay:10732 transfer 2 from regular-baker-0 to test --fee 0.5 &
-~ $ tezos-client --endpoint http://flashbake-relay-0.flashbake-relay:10732 transfer 2 from regular-baker-1 to test --fee 0.8 &
+~ $ tezos-client --endpoint http://flashbake-relay:10732 transfer 2 from regular-baker-0 to test --fee 0.5 &
+~ $ tezos-client --endpoint http://flashbake-relay:10732 transfer 2 from regular-baker-1 to test --fee 0.8 &
 ```
 
 Observe that the second transaction with the higher fee completes faster:
 
 ```
-[2]+  Done                       tezos-client --endpoint http://flashbake-relay-0.flashbake-relay:10732 transfer 2 from regular-baker-1 to test --fee 0.8
-[1]+  Done                       tezos-client --endpoint http://flashbake-relay-0.flashbake-relay:10732 transfer 2 from regular-baker-0 to test --fee 0.5
+[2]+  Done                       tezos-client --endpoint http://flashbake-relay:10732 transfer 2 from regular-baker-1 to test --fee 0.8
+[1]+  Done                       tezos-client --endpoint http://flashbake-relay:10732 transfer 2 from regular-baker-0 to test --fee 0.5
 ```
 
 The relay just forwards all of the transactions sent its way to the next flashbaker endpoint.

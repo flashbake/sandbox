@@ -1,0 +1,6 @@
+baker_url: flashbake-baker-0.flashbake-baker
+image:
+  repository: localhost/flashbake
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: dev

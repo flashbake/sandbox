@@ -22,7 +22,8 @@ function startBakerEndpoint(relayListenerPort: number, bakerListenerPort: number
 function main() {
   const relayListenerPort = 11732;
   const bakerListenerPort = 12732;
-  const rpcApiUrl = 'http://localhost:8732';
+  const bakerUrl = process.env["BAKER_URL"];
+  const rpcApiUrl = `http://${bakerUrl}:8732`;
 
   startBakerEndpoint(relayListenerPort, bakerListenerPort, rpcApiUrl);
 }
