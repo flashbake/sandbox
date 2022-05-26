@@ -1,10 +1,10 @@
 version: v1beta9
 images:
   flashbake:
-    image: tezos-k8s-flashbake
+    image: localhost/flashbake
     dockerfile: ./flashbake/Dockerfile
     context: ./flashbake
   flashbake_relay:
-    image: tezos-k8s-flashbake-relay
+    image: localhost/flashbake-relay
     dockerfile: ./flashbake-relay/Dockerfile
     context: ./flashbake-relay
