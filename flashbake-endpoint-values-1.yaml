@@ -1,4 +1,4 @@
-baker_url: flashbake-baker-0.flashbake-baker
+tezos_rpc_url: http://flashbake-baker-1:8732/
 image:
   repository: localhost/flashbake
   pullPolicy: IfNotPresent
