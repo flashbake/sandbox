@@ -1,6 +1,5 @@
-# Default values for flashbake-endpoint.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
+# URL to talk to Tezos RPC API
+tezos_rpc_url: http://localhost:8732
 
 replicaCount: 1
 

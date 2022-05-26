@@ -1,3 +1,4 @@
+tezos_rpc_url: http://flashbake-relay-node:8732/
 image:
   repository: localhost/flashbake-relay
   pullPolicy: IfNotPresent

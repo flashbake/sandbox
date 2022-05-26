@@ -40,8 +40,8 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
-          - name: BAKER_URL
-            value: {{ .Values.baker_url }}
+          - name: TEZOS_RPC_URL
+            value: {{ .Values.tezos_rpc_url }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
