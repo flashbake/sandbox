@@ -22,9 +22,9 @@ function startBakerEndpoint(relayListenerPort: number, bakerListenerPort: number
 function main() {
   const relayListenerPort = 11732;
   const bakerListenerPort = 12732;
-  const bakerUrl = process.env["BAKER_URL"];
-  const rpcApiUrl = `http://${bakerUrl}:8732`;
+  const rpcApiUrl = process.env["TEZOS_RPC_URL"] || '';
 
+  console.debug(`Using RPC API URL ${rpcApiUrl}`);
   startBakerEndpoint(relayListenerPort, bakerListenerPort, rpcApiUrl);
 }
 
