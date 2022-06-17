@@ -1,4 +1,6 @@
 tezos_rpc_url: http://flashbake-relay-node:8732/
+registry_contract: KT1QuofAgnsWffHzLA7D78rxytJruGHDe7XG
+relay_port: 10732
 image:
   repository: localhost/flashbake-relay
   pullPolicy: IfNotPresent

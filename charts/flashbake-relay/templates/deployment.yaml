@@ -37,11 +37,18 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
+          command:
+          - node
+          - app.js
+          - start
+          - --registry_contract
+          - {{ .Values.registry_contract }}
+          - --tezos_rpc_url
+          - {{ .Values.tezos_rpc_url }}
+          - --relay_port
+          - "{{ .Values.relay_port }}"
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          env:
-          - name: TEZOS_RPC_URL
-            value: {{ .Values.tezos_rpc_url }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

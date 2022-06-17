@@ -8,13 +8,13 @@ import {
   TaquitoRpcService,
 } from "@flashbake/relay";
 
-// Configurable parameters that are hardcoded for the prototype
-// TODO(keefertaylor): Refactor these constants to make them configuratble.
-const REGISTRY_CONTRACT_ADDRESS = "KT1QuofAgnsWffHzLA7D78rxytJruGHDe7XG"
+import yargs, { Argv } from "yargs";
+
+
 // The annotation of the big map in the registry contract
 const REGISTRY_BIG_MAP_ANNOTATION = "registry"
 
-async function startRelay(port: number, rpcApiUrl: string): Promise<HttpRelay> {
+async function startRelay(port: number, rpcApiUrl: string, registryContract: string): Promise<HttpRelay> {
   // Identify the big map to read data from.
   console.log(`Starting relay connected to node ${rpcApiUrl}`)
 
@@ -26,7 +26,7 @@ async function startRelay(port: number, rpcApiUrl: string): Promise<HttpRelay> {
   )
 
   const rpcService = new TaquitoRpcService(rpcApiUrl);
-  const bakerRegistry = new OnChainRegistryService(rpcService, REGISTRY_CONTRACT_ADDRESS, REGISTRY_BIG_MAP_ANNOTATION);
+  const bakerRegistry = new OnChainRegistryService(rpcService, registryContract, REGISTRY_BIG_MAP_ANNOTATION);
   bakerRegistry.initialize()
 
   const relayApp = express();
@@ -41,11 +41,24 @@ async function startRelay(port: number, rpcApiUrl: string): Promise<HttpRelay> {
 }
 
 async function main() {
-  const relayPort = 10732;
-  // const rpcApiUrl = 'http://flashbake-relay-node:8732';
-  const rpcApiUrl = process.env["TEZOS_RPC_URL"] || '';
+  let argv = await yargs
+    .command('start', "Start flashbake-relay.", (yargs: Argv) => {
+      return yargs.option('registry_contract', {
+        describe: "Registry contract address",
+        type: "string",
+        demandOption: true,
+      }).option('tezos_rpc_url', {
+        describe: "Tezos node RPC API URL",
+        type: "string",
+        demandOption: true,
+      }).option('relay_port', {
+        describe: "The port the relay is listening to",
+        type: "number",
+        demandOption: true,
+      })
+    }).argv;
 
-  startRelay(relayPort, rpcApiUrl);
+  startRelay(argv.relay_port, argv.tezos_rpc_url, argv.registry_contract);
 }
 
 main();
