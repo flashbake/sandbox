@@ -22,5 +22,5 @@ RUN npm install && \
   npm run build
 
 
-CMD [ "node", "app.js" ]
+CMD [ "node", "app.js", "start", "--registry_contract", "KT1QuofAgnsWffHzLA7D78rxytJruGHDe7XG" ]
 
