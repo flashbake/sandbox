@@ -37,6 +37,12 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
+          command:
+          - node
+          - app.js
+          - start
+          - --registry_contract
+          - {{ .Values.registry_contract }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
