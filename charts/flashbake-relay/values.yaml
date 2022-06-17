@@ -5,6 +5,9 @@ tezos_rpc_url: http://localhost:8732
 # when boostrapping a chain
 registry_contract: KT1QuofAgnsWffHzLA7D78rxytJruGHDe7XG
 
+# the port the relay is listening to
+relay_port: 10732
+
 replicaCount: 1
 
 image:
