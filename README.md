@@ -30,10 +30,22 @@ Build the flashbake container into your minikube instance:
 devspace build -t dev --skip-push
 ```
 
+Install Oxhead Alpha helm repository:
+
+```
+helm repo add oxheadalpha https://oxheadalpha.github.io/tezos-helm-charts/
+```
+
+Or update it if necessary:
+
+```
+helm repo update oxheadalpha
+```
+
 Next, we deploy 4 charts: one is running a private Tezos chain with `tezos-k8s`, the others are running two flashbake endpoints and one flashbake relay:
 
 ```
-helm install -f tezos-k8s-flashbake-values.yaml flashbake tezos-k8s/charts/tezos --namespace flashbake --create-namespace && \
+helm install -f tezos-k8s-flashbake-values.yaml flashbake oxheadalpha/tezos-chain --version 6.7.0 --namespace flashbake --create-namespace && \
 helm install -f flashbake-endpoint-values-0.yaml flashbake-endpoint-0 charts/flashbake-endpoint/ --namespace flashbake && \
 helm install -f flashbake-endpoint-values-1.yaml flashbake-endpoint-1 charts/flashbake-endpoint/ --namespace flashbake && \
 helm install -f flashbake-relay-values.yaml flashbake-relay charts/flashbake-relay/ --namespace flashbake

@@ -159,7 +159,7 @@ protocols:
   - command: 013-PtJakart
 
 tezos_k8s_images:
-  utils: oxheadalpha/tezos-k8s-utils:6.6.1
+  utils: oxheadalpha/tezos-k8s-utils:6.7.0
 
 full_snapshot_url: null
 rolling_snapshot_url: null
