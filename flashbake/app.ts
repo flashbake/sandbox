@@ -1,7 +1,7 @@
 import express from 'express';
 import { Mempool, InMemoryMempool } from "@flashbake/relay";
 import { HttpBakerEndpoint } from '@flashbake/baker-endpoint';
-
+import yargs, { Argv } from "yargs";
 
 function startBakerEndpoint(relayListenerPort: number, bakerListenerPort: number, rpcApiUrl: string): HttpBakerEndpoint {
   const relayFacingApp = express();
@@ -19,13 +19,25 @@ function startBakerEndpoint(relayListenerPort: number, bakerListenerPort: number
   return baker;
 }
 
-function main() {
-  const relayListenerPort = 11732;
-  const bakerListenerPort = 12732;
-  const rpcApiUrl = process.env["TEZOS_RPC_URL"] || '';
+async function main() {
+  let argv = await yargs
+    .command('start', "Start flashbake-endpoint.", (yargs: Argv) => {
+      return yargs.option('relay_listener_port', {
+        describe: "Relay listener port",
+        type: "number",
+        demandOption: true,
+      }).option('tezos_rpc_url', {
+        describe: "Tezos node RPC API URL",
+        type: "string",
+        demandOption: true,
+      }).option('baker_listener_port', {
+        describe: "Baker listener port",
+        type: "number",
+        demandOption: true,
+      })
+    }).argv;
 
-  console.debug(`Using RPC API URL ${rpcApiUrl}`);
-  startBakerEndpoint(relayListenerPort, bakerListenerPort, rpcApiUrl);
+  startBakerEndpoint(argv.relay_listener_port, argv.baker_listener_port, argv.tezos_rpc_url);
 }
 
 main();

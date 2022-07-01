@@ -39,9 +39,16 @@ spec:
               protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          env:
-          - name: TEZOS_RPC_URL
-            value: {{ .Values.tezos_rpc_url }}
+          command:
+          - node
+          - app.js
+          - start
+          - --relay_listener_port
+          - "{{ .Values.relay_listener_port }}"
+          - --tezos_rpc_url
+          - {{ .Values.tezos_rpc_url }}
+          - --baker_listener_port
+          - "{{ .Values.baker_listener_port }}"
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

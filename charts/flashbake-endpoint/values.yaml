@@ -1,6 +1,15 @@
 # URL to talk to Tezos RPC API
 tezos_rpc_url: http://localhost:8732
 
+# port where endpoint listens to relay connections
+relay_listener_port: 11732
+
+# port where endpoint listens to connections from the
+# baker. --operations-pool argument of the baker should
+# target this endpoint.
+baker_listener_port: 12732
+
+
 replicaCount: 1
 
 image:
