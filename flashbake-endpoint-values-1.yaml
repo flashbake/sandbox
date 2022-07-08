@@ -3,7 +3,7 @@ relay_listener_port: 11732
 baker_listener_port: 12732
 
 image:
-  repository: localhost/flashbake
-  pullPolicy: IfNotPresent
+  repository: ghcr.io/flashbake/baker-endpoint
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: dev
+  tag: move_app_ts

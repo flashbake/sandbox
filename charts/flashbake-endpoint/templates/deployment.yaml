@@ -41,7 +41,7 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           command:
           - node
-          - app.js
+          - /baker-endpoint/build/src/app.js
           - start
           - --relay_listener_port
           - "{{ .Values.relay_listener_port }}"

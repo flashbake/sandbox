@@ -2,7 +2,7 @@ tezos_rpc_url: http://flashbake-relay-node:8732/
 registry_contract: KT1QuofAgnsWffHzLA7D78rxytJruGHDe7XG
 relay_port: 10732
 image:
-  repository: localhost/flashbake-relay
-  pullPolicy: IfNotPresent
+  repository: ghcr.io/flashbake/relay
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: dev
+  tag: move_app_ts

@@ -39,7 +39,7 @@ spec:
               protocol: TCP
           command:
           - node
-          - app.js
+          - /relay/build/src/app.js
           - start
           - --registry_contract
           - {{ .Values.registry_contract }}
