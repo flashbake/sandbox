@@ -34,14 +34,17 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: http
-              containerPort: 80
+            - name: relay
+              containerPort: {{ .Values.relay_listener_port }}
+              protocol: TCP
+            - name: baker
+              containerPort: {{ .Values.baker_listener_port }}
               protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           command:
           - node
-          - /baker-endpoint/build/src/app.js
+          - app.js
           - start
           - --relay_listener_port
           - "{{ .Values.relay_listener_port }}"

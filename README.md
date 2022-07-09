@@ -16,39 +16,29 @@ Upon deployment, you will have:
 
 ## How to deploy the prototype locally
 
-You need minikube, helm and devspace.
+You need minikube and helm.
 
-Clone this repo's submodules:
-
-```
-git submodule update --init
-```
-
-Build the flashbake container into your minikube instance:
-
-```
-devspace build -t dev --skip-push
-```
-
-Install Oxhead Alpha helm repository:
+Install Oxhead Alpha and Flashbake helm repositories:
 
 ```
 helm repo add oxheadalpha https://oxheadalpha.github.io/tezos-helm-charts/
+helm repo add flashbake https://flashbake.github.io/endpoints-monorepo/
 ```
 
 Or update it if necessary:
 
 ```
 helm repo update oxheadalpha
+helm repo update flashbake
 ```
 
 Next, we deploy 4 charts: one is running a private Tezos chain with `tezos-k8s`, the others are running two flashbake endpoints and one flashbake relay:
 
 ```
 helm install -f tezos-k8s-flashbake-values.yaml flashbake oxheadalpha/tezos-chain --version 6.7.0 --namespace flashbake --create-namespace && \
-helm install -f flashbake-endpoint-values-0.yaml flashbake-endpoint-0 charts/flashbake-endpoint/ --namespace flashbake && \
-helm install -f flashbake-endpoint-values-1.yaml flashbake-endpoint-1 charts/flashbake-endpoint/ --namespace flashbake && \
-helm install -f flashbake-relay-values.yaml flashbake-relay charts/flashbake-relay/ --namespace flashbake
+helm install flashbake-endpoint-0 flashbake/baker-endpoint --namespace flashbake --set tezos_rpc_url=http://flashbake-baker-0:8732 --set relay_listener_port=11732 --set baker_listener_port=12732 && \
+helm install flashbake-endpoint-1 flashbake/baker-endpoint --namespace flashbake --set tezos_rpc_url=http://flashbake-baker-1:8732 --set relay_listener_port=11732 --set baker_listener_port=12732 && \
+helm install flashbake-relay flashbake/relay --namespace flashbake --set tezos_rpc_url=http://flashbake-relay-node:8732 --set registry_contract=KT1QuofAgnsWffHzLA7D78rxytJruGHDe7XG --set relay_port=8732
 ```
 
 
@@ -81,7 +71,7 @@ Observe the transaction going through instantly (block times are 5 seconds).
 To send a transaction with flashbake, bypassing the mempool, change the endpoint to the flashbake relay:
 
 ```
-tezos-client --endpoint http://flashbake-relay:10732 transfer 555 from regular-baker-0 to test
+tezos-client --endpoint http://flashbake-relay:8732 transfer 555 from regular-baker-0 to test
 ```
 
 Observe the transaction going through, but slower than previously: only half of the bakers are flashbakers, you must wait until it is a flashbaker's time to bake.

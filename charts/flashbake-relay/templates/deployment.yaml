@@ -37,9 +37,10 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
-          command:
-          - node
-          - /relay/build/src/app.js
+          #command:
+          #- node
+          #- /relay/build/src/app.js
+          args:
           - start
           - --registry_contract
           - {{ .Values.registry_contract }}
