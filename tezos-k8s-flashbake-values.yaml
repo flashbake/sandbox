@@ -12,12 +12,12 @@ accounts:
   regular-baker-0:
     # tz1RboUV4wePuCRgd9gWHozaGnpsGo7sKouw
     bootstrap_balance: '4000000000000'
-    is_bootstrap_baker_account: true
+    is_bootstrap_baker_account: false
     key: edsk46SU6GdQLmUuEDZhk9LDAtY5HuAV8F4QRcyTxWt58R4UKq4cPm
   regular-baker-1:
     # tz1Rb1cTbq4KXzjkVU8zMFNhMosqFgxi6D2h
     bootstrap_balance: '4000000000000'
-    is_bootstrap_baker_account: true
+    is_bootstrap_baker_account: false
     key: edsk3TtB3khnR7oMGsyyQMET72GzSwEjwXf1bU1hM1yzWt1hBYLMCH
 activation:
   protocol_hash: PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY
@@ -87,7 +87,7 @@ activation:
 bootstrap_peers: []
 expected_proof_of_work: 0
 images:
-  octez: tezos/tezos:v13.0
+  octez: localhost/tezos:latest
 is_invitation: false
 node_config_network:
   activation_account_name: flashbake-baker-0
@@ -101,7 +101,7 @@ nodes:
   flashbake-baker-0:
     env:
       baker:
-        BAKER_EXTRA_ARGS: "--operations-pool http://flashbake-endpoint-0:12732/operations-pool"
+        BAKER_EXTRA_ARGS: "--operations-pool /var/tezos/node/pool.json"
     instances:
     - bake_using_accounts:
       - flashbake-baker-0
@@ -115,7 +115,7 @@ nodes:
   flashbake-baker-1:
     env:
       baker:
-        BAKER_EXTRA_ARGS: "--operations-pool http://flashbake-endpoint-1:12732/operations-pool"
+        BAKER_EXTRA_ARGS: "--operations-pool /var/tezos/node/pool.json"
     instances:
     - bake_using_accounts:
       - flashbake-baker-1

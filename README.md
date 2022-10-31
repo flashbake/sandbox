@@ -1,9 +1,9 @@
-Flashbake prototype
-===================
+Flashbake Sandbox
+=================
 
 [Flashbake](https://forum.tezosagora.org/t/announcing-flashbake-an-initiative-to-tackle-bpev-on-tezos/4006) aims at exploring the problems of Block Producer Extractable Value on Tezos.
 
-This repo contains a prototype consisting of a self-contained Tezos private chain running Flashbake. It can be deployed locally on a laptop with minikube and helm.
+This repo contains a Flashbake sandbox consisting of a self-contained Tezos private chain running Flashbake. It can be deployed locally on a laptop with minikube and helm.
 
 Upon deployment, you will have:
 
@@ -14,7 +14,7 @@ Upon deployment, you will have:
 * a **flashbake relay**, forwarding most queries to an actual tezos RPC, except the inject operation which goes to the flashbake endpoint of the next flashbaker. The relay is backed by a dedicated tezos node.
 * an **on-chain registry contract** where flashbakers can register their endpoints
 
-## How to deploy the prototype locally
+## How to deploy the sandbox locally
 
 You need minikube and helm.
 
