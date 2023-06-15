@@ -35,10 +35,10 @@ helm repo update flashbake
 Next, we deploy 4 charts: one is running a private Tezos chain with `tezos-k8s`, the others are running two flashbake endpoints and one flashbake relay:
 
 ```
-helm install -f tezos-k8s-flashbake-values.yaml flashbake oxheadalpha/tezos-chain --version 6.7.0 --namespace flashbake --create-namespace && \
-helm install flashbake-endpoint-0 flashbake/baker-endpoint --namespace flashbake --set tezos_rpc_url=http://flashbake-baker-0:8732 --set relay_listener_port=11732 --set baker_listener_port=12732 && \
-helm install flashbake-endpoint-1 flashbake/baker-endpoint --namespace flashbake --set tezos_rpc_url=http://flashbake-baker-1:8732 --set relay_listener_port=11732 --set baker_listener_port=12732 && \
-helm install flashbake-relay flashbake/relay --namespace flashbake --set tezos_rpc_url=http://flashbake-relay-node:8732 --set registry_contract=KT1QuofAgnsWffHzLA7D78rxytJruGHDe7XG --set relay_port=8732
+helm install -f tezos-k8s-flashbake-values.yaml flashbake oxheadalpha/tezos-chain --version 6.20.2 --namespace flashbake --create-namespace && \
+helm install -f flashbake-endpoint-values-0.yaml flashbake-endpoint-0  flashbake/baker-endpoint  -n flashbake && \
+helm install -f flashbake-endpoint-values-1.yaml flashbake-endpoint-1  flashbake/baker-endpoint  -n flashbake && \
+helm install -f flashbake-relay-values.yaml flashbake-relay  flashbake/relay  -n flashbake
 ```
 
 
