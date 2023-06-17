@@ -1,3 +1,8 @@
 tezos_rpc_url: http://flashbake-baker-0:8732/
 relay_listener_port: 11732
 baker_listener_port: 12732
+image:
+  repository: localhost/baker-endpoint
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: latest

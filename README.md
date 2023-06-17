@@ -62,8 +62,8 @@ From within the container, you have access to the baker's funds. The account ali
 Create a new test account and send tez to it the normal way (via the node mempool):
 
 ```
-tezos-client gen keys test
-tezos-client transfer 444 from regular-baker-0 to test --burn-cap 0.257
+octez-client gen keys test
+octez-client transfer 444 from regular-baker-0 to test --burn-cap 0.257
 ```
 
 Observe the transaction going through instantly (block times are 5 seconds).
@@ -71,7 +71,7 @@ Observe the transaction going through instantly (block times are 5 seconds).
 To send a transaction with flashbake, bypassing the mempool, change the endpoint to the flashbake relay:
 
 ```
-tezos-client --endpoint http://flashbake-relay:8732 transfer 555 from regular-baker-0 to test
+octez-client --endpoint http://flashbake-relay:8732 transfer 555 from regular-baker-0 to test
 ```
 
 Observe the transaction going through, but slower than previously: only half of the bakers are flashbakers, you must wait until it is a flashbaker's time to bake.
@@ -89,7 +89,7 @@ while true; do curl -s http://localhost:8732/chains/main/mempool/monitor_operati
 Then, back in k9s, open a shell again to `regular-baker-0` and run the same operations again:
 
 ```
-tezos-client transfer 444 from regular-baker-0 to test
+octez-client transfer 444 from regular-baker-0 to test
 ```
 
 The output of the transaction should show the operation hash:
@@ -114,7 +114,7 @@ nochem@fedora /tmp $ grep onhHbaKDnzVKyMMF1gUgxgE63BnPuHtJnxbQikyaxsLFyB7hGb5 me
 Then back into k9s, run the flashbake operation again:
 
 ```
-tezos-client --endpoint http://flashbake-relay:10732 transfer 555 from regular-baker-0 to test
+octez-client --endpoint http://flashbake-relay:10732 transfer 555 from regular-baker-0 to test
 ```
 
 Grab the operation hash from the output:
@@ -241,15 +241,15 @@ It puts incoming bundles to the flashbake mempool. When receiving a request from
 From regular-baker-0, send 2 Flashbake transactions in quick succession, with increasing fees:
 
 ```
-~ $ tezos-client --endpoint http://flashbake-relay:10732 transfer 2 from regular-baker-0 to test --fee 0.5 &
-~ $ tezos-client --endpoint http://flashbake-relay:10732 transfer 2 from regular-baker-1 to test --fee 0.8 &
+~ $ octez-client --endpoint http://flashbake-relay:10732 transfer 2 from regular-baker-0 to test --fee 0.5 &
+~ $ octez-client --endpoint http://flashbake-relay:10732 transfer 2 from regular-baker-1 to test --fee 0.8 &
 ```
 
 Observe that the second transaction with the higher fee completes faster:
 
 ```
-[2]+  Done                       tezos-client --endpoint http://flashbake-relay:10732 transfer 2 from regular-baker-1 to test --fee 0.8
-[1]+  Done                       tezos-client --endpoint http://flashbake-relay:10732 transfer 2 from regular-baker-0 to test --fee 0.5
+[2]+  Done                       octez-client --endpoint http://flashbake-relay:10732 transfer 2 from regular-baker-1 to test --fee 0.8
+[1]+  Done                       octez-client --endpoint http://flashbake-relay:10732 transfer 2 from regular-baker-0 to test --fee 0.5
 ```
 
 The relay just forwards all of the transactions sent its way to the next flashbaker endpoint.

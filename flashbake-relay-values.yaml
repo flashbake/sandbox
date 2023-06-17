@@ -1,3 +1,8 @@
 tezos_rpc_url: http://flashbake-relay-node:8732/
 registry_contract: KT1QuofAgnsWffHzLA7D78rxytJruGHDe7XG
-relay_port: 10732
+relay_port: 8732
+image:
+  repository: localhost/relay
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: latest

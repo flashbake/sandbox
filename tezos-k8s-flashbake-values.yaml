@@ -6,13 +6,13 @@ accounts:
     bootstrap_balance: '4000000000000'
     is_bootstrap_baker_account: true
     key: edsk3E2YCb56fN9TiHL5JRR6xNXrBcWt35fSSEmz3Qh2KR9CgjJD1s
-    operations_pool: http://flashbake-endpoint-0:12732
+    operations_pool: http://flashbake-endpoint-0:12732/operations-pool
   flashbake-baker-1:
     # tz1fb1RzVWyrkPb6BBWR7D1hf3GyWzGifraf
     bootstrap_balance: '4000000000000'
     is_bootstrap_baker_account: true
     key: edsk2iAy5Ldv4pSGMa6xhfZpteYrbVVNrUqeQRW2wQuVFCdeovGWNy
-    operations_pool: http://flashbake-endpoint-1:12732
+    operations_pool: http://flashbake-endpoint-1:12732/operations-pool
   regular-baker-0:
     # tz1RboUV4wePuCRgd9gWHozaGnpsGo7sKouw
     bootstrap_balance: '4000000000000'
