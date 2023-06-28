@@ -1,0 +1,9 @@
+tezos_rpc_url: http://flashbake-relay-node:8732/
+secrets:
+  flywheel_sk: edsk4Za6PqhfNLf7M44YYLf1E7cEctzyvrhvA8BD9QkFvnGyeLkFXY
+per_block_bribe: 200
+image:
+  repository: localhost/flywheel
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: latest

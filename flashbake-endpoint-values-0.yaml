@@ -1,6 +1,7 @@
 tezos_rpc_url: http://flashbake-baker-0:8732/
 relay_listener_port: 11732
 baker_listener_port: 12732
+baker_pubkey: tz1fboti4soXCzGKXK5WfEEpHxPi59WoRoQY
 image:
   repository: localhost/baker-endpoint
   pullPolicy: IfNotPresent

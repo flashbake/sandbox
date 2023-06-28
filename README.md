@@ -38,7 +38,9 @@ Next, we deploy 4 charts: one is running a private Tezos chain with `tezos-k8s`,
 helm install -f tezos-k8s-flashbake-values.yaml flashbake oxheadalpha/tezos-chain --version 6.20.2 --namespace flashbake --create-namespace && \
 helm install -f flashbake-endpoint-values-0.yaml flashbake-endpoint-0  flashbake/baker-endpoint  -n flashbake && \
 helm install -f flashbake-endpoint-values-1.yaml flashbake-endpoint-1  flashbake/baker-endpoint  -n flashbake && \
-helm install -f flashbake-relay-values.yaml flashbake-relay  flashbake/relay  -n flashbake
+helm install -f flashbake-relay-values.yaml flashbake-relay  flashbake/relay  -n flashbake && \
+helm install -f flashbake-flywheel-values.yaml flashbake-flywheel  flashbake/flywheel  -n flashbake
+
 ```
 
 
